@@ -12,6 +12,8 @@ class MainWindow(QMainWindow):
 
         self._drag_position = QPoint()
         self._dragging = False
+        if self.windowHandle():
+            self.windowHandle().windowStateChanged.connect(self._handleStateChange)
 
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
@@ -21,7 +23,7 @@ class MainWindow(QMainWindow):
         self.main_layout.setSpacing(0)
 
         self.title_bar_container = QWidget()
-        self.title_bar_container.setFixedHeight(25)
+        self.title_bar_container.setFixedHeight(26)
         self.title_bar_container.setStyleSheet("""background-color: #282828;""")
         self.title_bar = QHBoxLayout(self.title_bar_container)
         self.title_bar.setContentsMargins(0, 0, 0, 0)
@@ -32,24 +34,23 @@ class MainWindow(QMainWindow):
         
         self.addToTitleBar()
 
-        if self.windowHandle():
-            self.windowHandle().windowStateChanged.connect(self._handleStateChange)
-
 
     def addToTitleBar(self):
         title_label = QLabel("Wordle", self)
         title_label.setStyleSheet("""color: white;
                                   font-weight: bold;
                                   padding-left: 4px;
-                                  padding-bottom: 1px""")
+                                  padding-bottom: 2px""")
         
         close_button = QPushButton('✖', self)
         close_button.setStyleSheet("""QPushButton{ color: white;
                                         border: 0px;
                                         font-size: 14px;
+                                        padding-bottom: 2px
                                    }
                                    QPushButton:hover {
-                                        background-color: red;}
+                                        background-color: red;
+                                        }
                                    """)
         minimalize_button = QPushButton('—', self)
         minimalize_button.setStyleSheet("""QPushButton{ color: white;
@@ -60,8 +61,8 @@ class MainWindow(QMainWindow):
                                         background-color: #3d3d3d;}
                                     """)
 
-        close_button.setFixedSize(25, 25)
-        minimalize_button.setFixedSize(25, 25)
+        close_button.setFixedSize(26, 26)
+        minimalize_button.setFixedSize(26, 26)
 
         close_button.clicked.connect(self.close)
         minimalize_button.clicked.connect(self.showMinimized)
