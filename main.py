@@ -1,13 +1,17 @@
 from PySide6.QtWidgets import QMainWindow, QApplication, QLabel, QHBoxLayout, QPushButton, QWidget, QVBoxLayout
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QPropertyAnimation, QEasingCurve, QRect, QPoint
+from PySide6.QtGui import QWindow, QMouseEvent 
 import sys
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setGeometry(300, 150, 1200, 750)
+        self.setGeometry(390, 140, 1200, 750)
         self.setStyleSheet("""background-color: #383838;""")
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)  # deletes default title bar
+
+        self._drag_position = QPoint()
+        self._dragging = False
 
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
@@ -27,6 +31,9 @@ class MainWindow(QMainWindow):
         self.main_layout.addStretch()   # adds space for remaining content
         
         self.addToTitleBar()
+
+        if self.windowHandle():
+            self.windowHandle().windowStateChanged.connect(self._handleStateChange)
 
 
     def addToTitleBar(self):
@@ -64,6 +71,30 @@ class MainWindow(QMainWindow):
         
         self.title_bar.addWidget(minimalize_button)
         self.title_bar.addWidget(close_button)
+
+
+    def mousePressEvent(self, event: QMouseEvent):        
+        if event.button() == Qt.MouseButton.LeftButton:
+
+            local_pos_int = event.position().toPoint() 
+            global_click_pos = self.mapToGlobal(local_pos_int)
+            
+            if self.title_bar_container.geometry().contains(self.title_bar_container.mapFromGlobal(global_click_pos)):
+                self._dragging = True
+                self._drag_position = event.globalPosition().toPoint() - self.pos()
+                event.accept()
+
+
+    def mouseMoveEvent(self, event: QMouseEvent):
+        if self._dragging:
+            self.move(event.globalPosition().toPoint() - self._drag_position)
+            event.accept()
+
+
+    def mouseReleaseEvent(self, event: QMouseEvent):
+        if event.button() == Qt.MouseButton.LeftButton:
+            self._dragging = False
+            event.accept()
 
 
 if __name__ == "__main__":
