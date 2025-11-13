@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QMainWindow, QApplication, QLabel, QHBoxLayout, QPushButton, QWidget, QVBoxLayout
-from PySide6.QtCore import Qt, QPropertyAnimation, QEasingCurve, QRect, QPoint
-from PySide6.QtGui import QWindow, QMouseEvent 
+from PySide6.QtCore import Qt, QPoint
+from PySide6.QtGui import QMouseEvent 
 import sys
 
 class MainWindow(QMainWindow):
