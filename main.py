@@ -170,7 +170,6 @@ class MainWindow(QMainWindow):
         if event.button() == Qt.MouseButton.LeftButton:
             local_pos_int = event.position().toPoint() 
             global_click_pos = self.mapToGlobal(local_pos_int)
-            d
             if self.title_bar_container.geometry().contains(self.title_bar_container.mapFromGlobal(global_click_pos)):
                 self._dragging = True
                 self._drag_position = event.globalPosition().toPoint() - self.pos()
