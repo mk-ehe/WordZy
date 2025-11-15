@@ -28,11 +28,41 @@ class MainWindow(QMainWindow):
         self.title_bar.setContentsMargins(0, 0, 0, 0)
         self.title_bar.setSpacing(0)
         
+
+        self.correct_word = "mamal"
+
         
+        self.game_finished = False
         self.grid_container = QWidget()
         self.grid_layout = QGridLayout(self.grid_container)
         self.grid_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.grid_layout.setContentsMargins(0, 80, 0, 0)
+        self.default_grid_style = """
+            QLabel {
+                border: 2px solid #555555;
+                color: white;
+                background-color: #383838;
+                font: bold 28pt "Arial";
+            }
+            QLabel[state="filled"] {
+                border: 2px solid white;
+            }
+            QLabel[state="active"] {
+                border: 2px solid #949494;
+            }
+            QLabel[state="correct"] {
+                border: 2px solid #00d90b;
+                color: #00d90b;
+            }
+            QLabel[state="wrong"] {
+                border: 2px solid #1c1c1c;
+                color: #1c1c1c;
+            }
+            QLabel[state="placement"] {
+                border: 2px solid #f2d202;
+                color: #f2d202;
+            }
+        """
         self.current_row = 0
         self.current_col = 0
         self.grid_labels = []
@@ -91,27 +121,12 @@ class MainWindow(QMainWindow):
 
 
     def createGrid(self):
-        default_style = """
-            QLabel {
-                border: 2px solid #555555;
-                color: white;
-                background-color: #383838;
-                font: bold 28pt "Arial";
-            }
-            QLabel[state="filled"] {
-                border: 2px solid white;
-            }
-            QLabel[state="active"] {
-                border: 2px solid #949494;
-            }
-        """
-
         for row in range(self.GRID_ROWS):
             for col in range(self.GRID_COLS):
                 label = QLabel() 
                 label.setAlignment(Qt.AlignmentFlag.AlignCenter)
                 label.setFixedSize(60, 60)
-                label.setStyleSheet(default_style)
+                label.setStyleSheet(self.default_grid_style)
                 label.setProperty("state", "empty")
 
                 self.grid_labels.append(label)
@@ -135,6 +150,10 @@ class MainWindow(QMainWindow):
             active_idx = self.current_row * 5 + self.current_col
 
             for i, label in enumerate(self.grid_labels):
+                current_state = label.property("state")
+                if current_state in ["correct", "wrong", "placement"]:
+                    continue
+                    
                 if i == active_idx:
                     label.setProperty("state", "active" if label.text() == "" else "filled")
                 else:
@@ -143,7 +162,35 @@ class MainWindow(QMainWindow):
                 label.style().polish(label)
 
     
+    def checkCorrectLetters(self):
+        word_entered = ""
+        start_idx = self.current_row * self.GRID_COLS
+        end_idx = start_idx + self.GRID_COLS
+
+        for i in range(start_idx, end_idx):
+            idx = i - start_idx
+            letter = self.grid_labels[i].text().lower()
+            
+            if letter == self.correct_word [idx]:
+                self.grid_labels[i].setProperty("state", "correct")
+            elif letter in self.correct_word  and letter != self.correct_word [idx]:
+                self.grid_labels[i].setProperty("state", "placement")
+            else:
+                self.grid_labels[i].setProperty("state", "wrong")
+            
+            self.grid_labels[i].style().polish(self.grid_labels[i])
+            word_entered += letter
+            
+        if word_entered == self.correct_word :
+            print("You guessed correctly!")
+            self.game_finished = True
+        else:
+            word_entered = ""
+
+    
     def keyPressEvent(self, event: QKeyEvent):
+        if self.game_finished:
+            return
         key = event.key()
         
         if Qt.Key.Key_A <= key <= Qt.Key.Key_Z:
@@ -161,9 +208,11 @@ class MainWindow(QMainWindow):
 
         elif key == Qt.Key.Key_Return or key == Qt.Key.Key_Enter:
             if self.current_col == 5 and self.current_row < 6:
+                self.checkCorrectLetters()
                 self.current_row += 1
                 self.current_col = 0
-                self.setActiveCell()
+                if not self.game_finished:
+                    self.setActiveCell()
     
 
     def mousePressEvent(self, event: QMouseEvent):        
