@@ -25,7 +25,6 @@ class MainWindow(QMainWindow):
 
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
-        
         self.main_layout = QVBoxLayout(self.central_widget)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(0)
@@ -47,7 +46,7 @@ class MainWindow(QMainWindow):
         self.grid_container = QWidget()
         self.grid_layout = QGridLayout(self.grid_container)
         self.grid_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.grid_layout.setContentsMargins(0, 80, 0, 0)
+        self.grid_layout.setContentsMargins(0, 10, 0, 0)
         self.default_grid_style = """
             QLabel {
                 border: 2px solid #555555;
@@ -85,7 +84,22 @@ class MainWindow(QMainWindow):
         self.GRID_COLS = 5
 
 
+        self.wordzy_container = QWidget()
+        wordzy_layout = QVBoxLayout(self.wordzy_container)
+        wordzy_layout.setContentsMargins(0, 10, 0, 0)
+
+        self.wordzy_label = QLabel("WordZy", self.wordzy_container)
+        self.wordzy_label.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop)
+        self.wordzy_label.setStyleSheet("""
+            font-size: 48px;
+            font-weight: bold;
+            color: white;
+        """)
+        wordzy_layout.addWidget(self.wordzy_label)
+
+
         self.main_layout.addWidget(self.title_bar_container)
+        self.main_layout.addWidget(self.wordzy_container)
         self.main_layout.addWidget(self.grid_container)
 
         
@@ -101,7 +115,7 @@ class MainWindow(QMainWindow):
             words = response.text.strip().split('\n')
             return [w.lower().strip() for w in words if w.strip()]
         except:
-            return ["house", "table", "apple", "bread", "chair"]
+            return ["error"]
 
 
     def getDailyWord(self):
