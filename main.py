@@ -1,7 +1,11 @@
 from PySide6.QtWidgets import QMainWindow, QApplication, QLabel, QHBoxLayout, QPushButton, QWidget, QVBoxLayout, QGridLayout
-from PySide6.QtCore import Qt, QPoint
-from PySide6.QtGui import QMouseEvent, QKeyEvent 
+from PySide6.QtCore import Qt, QPoint, QTimer
+from PySide6.QtGui import QMouseEvent, QKeyEvent
 import sys
+import requests
+from datetime import datetime
+import random
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -12,6 +16,12 @@ class MainWindow(QMainWindow):
 
         self._drag_position = QPoint()
         self._dragging = False
+
+        self.invalid_timer = QTimer()
+        self.invalid_timer.setSingleShot(True)
+        self.invalid_timer.timeout.connect(self.resetInvalidWord)
+
+        self.invalid_word = False
 
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
@@ -29,10 +39,11 @@ class MainWindow(QMainWindow):
         self.title_bar.setSpacing(0)
         
 
-        self.correct_word = "mamal"
-
-        
+        self.valid_words = self.loadValidWords()
+        self.correct_word = self.getDailyWord()
         self.game_finished = False
+        
+
         self.grid_container = QWidget()
         self.grid_layout = QGridLayout(self.grid_container)
         self.grid_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -62,13 +73,16 @@ class MainWindow(QMainWindow):
                 border: 2px solid #f2d202;
                 color: #f2d202;
             }
+            QLabel[state="invalid"] {
+                border: 2px solid red;
+                color: red;
+            }
         """
         self.current_row = 0
         self.current_col = 0
         self.grid_labels = []
         self.GRID_ROWS = 6
         self.GRID_COLS = 5
-        self.WORD_LENGTH = 5
 
 
         self.main_layout.addWidget(self.title_bar_container)
@@ -81,8 +95,29 @@ class MainWindow(QMainWindow):
         self.main_layout.addStretch()   # adds space for remaining content
 
 
+    def loadValidWords(self):
+        try:
+            response = requests.get("https://gist.githubusercontent.com/cfreshman/a03ef2cba789d8cf00c08f767e0fad7b/raw/wordle-answers-alphabetical.txt")
+            words = response.text.strip().split('\n')
+            return [w.lower().strip() for w in words if w.strip()]
+        except:
+            return ["house", "table", "apple", "bread", "chair"]
+
+
+    def getDailyWord(self):
+        today = datetime.now().date()
+        seed = int(today.strftime("%Y%m%d"))
+        random.seed(seed)
+        daily_word = random.choice(self.valid_words)
+        return daily_word
+        
+        
+    def isValidWord(self, word):
+        return word.lower() in self.valid_words
+
+
     def addToTitleBar(self):
-        title_label = QLabel("Wordle", self)
+        title_label = QLabel("WordZy", self)
         title_label.setStyleSheet("""color: white;
                                   font-weight: bold;
                                   padding-left: 4px;
@@ -171,9 +206,9 @@ class MainWindow(QMainWindow):
             idx = i - start_idx
             letter = self.grid_labels[i].text().lower()
             
-            if letter == self.correct_word [idx]:
+            if letter == self.correct_word[idx]:
                 self.grid_labels[i].setProperty("state", "correct")
-            elif letter in self.correct_word  and letter != self.correct_word [idx]:
+            elif letter in self.correct_word and letter != self.correct_word[idx]:
                 self.grid_labels[i].setProperty("state", "placement")
             else:
                 self.grid_labels[i].setProperty("state", "wrong")
@@ -181,16 +216,50 @@ class MainWindow(QMainWindow):
             self.grid_labels[i].style().polish(self.grid_labels[i])
             word_entered += letter
             
-        if word_entered == self.correct_word :
+        if word_entered == self.correct_word:
             print("You guessed correctly!")
+            self.game_finished = True
+        elif self.grid_labels[-1].text() != "":
+            print(f"Today's word was: {self.correct_word}")
             self.game_finished = True
         else:
             word_entered = ""
+
+
+    def showInvalidWord(self):
+        start_idx = self.current_row * self.GRID_COLS
+        end_idx = start_idx + self.GRID_COLS
+
+        for i in range(start_idx, end_idx):
+            self.grid_labels[i].setProperty("state", "invalid")
+            self.grid_labels[i].style().polish(self.grid_labels[i])
+
+        if not self.invalid_word:
+            print("Invalid word!")
+            self.invalid_word = True
+
+        if self.invalid_timer.isActive():
+            self.invalid_timer.stop()
+
+        self.invalid_timer.start(1100)
+
+
+    def resetInvalidWord(self):
+        start_idx = self.current_row * self.GRID_COLS
+        end_idx = start_idx + self.GRID_COLS
+
+        for i in range(start_idx, end_idx):
+            if self.grid_labels[i].property("state") == "invalid":
+                self.grid_labels[i].setProperty("state", "filled")
+                self.grid_labels[i].style().polish(self.grid_labels[i])
+                
+        self.invalid_word = False
 
     
     def keyPressEvent(self, event: QKeyEvent):
         if self.game_finished:
             return
+        
         key = event.key()
         
         if Qt.Key.Key_A <= key <= Qt.Key.Key_Z:
@@ -207,13 +276,27 @@ class MainWindow(QMainWindow):
                 self.setActiveCell()
 
         elif key == Qt.Key.Key_Return or key == Qt.Key.Key_Enter:
+            if event.isAutoRepeat():
+                self.showInvalidWord()
+                return
+
             if self.current_col == 5 and self.current_row < 6:
+                start_idx = self.current_row * self.GRID_COLS
+                word_entered = ""
+                for i in range(start_idx, start_idx + self.GRID_COLS):
+                    word_entered += self.grid_labels[i].text().lower()
+
+                if not self.isValidWord(word_entered):
+                    self.showInvalidWord()
+                    return
+                
                 self.checkCorrectLetters()
                 self.current_row += 1
                 self.current_col = 0
+
                 if not self.game_finished:
                     self.setActiveCell()
-    
+
 
     def mousePressEvent(self, event: QMouseEvent):        
         if event.button() == Qt.MouseButton.LeftButton:
