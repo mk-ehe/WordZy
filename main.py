@@ -43,6 +43,11 @@ class MainWindow(QMainWindow):
         self.game_finished = False
         
 
+        self.last_words = self.getLastWords()
+        print(f"Yesterdays word: {self.last_words[-1]}")
+        print(f"Last seven days: {self.last_words}")
+
+
         self.grid_container = QWidget()
         self.grid_layout = QGridLayout(self.grid_container)
         self.grid_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -118,13 +123,19 @@ class MainWindow(QMainWindow):
             return ["error"]
 
 
-    def getDailyWord(self):
+    def getDailyWord(self, rewind = 0):
         today = datetime.now().date()
         seed = int(today.strftime("%Y%m%d"))
-        random.seed(seed)
+        random.seed(seed - rewind)
         daily_word = random.choice(self.valid_words)
-        print(daily_word)
         return daily_word
+    
+    
+    def getLastWords(self):
+        last_words = []
+        for i in range(1, 8):
+            last_words.append(self.getDailyWord(i))
+        return last_words
         
         
     def isValidWord(self, word):
