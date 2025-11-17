@@ -109,6 +109,7 @@ class MainWindow(QMainWindow):
         seed = int(today.strftime("%Y%m%d"))
         random.seed(seed)
         daily_word = random.choice(self.valid_words)
+        print(daily_word)
         return daily_word
         
         
@@ -202,19 +203,34 @@ class MainWindow(QMainWindow):
         start_idx = self.current_row * self.GRID_COLS
         end_idx = start_idx + self.GRID_COLS
 
+        available_letters = list(self.correct_word)
+        
         for i in range(start_idx, end_idx):
             idx = i - start_idx
             letter = self.grid_labels[i].text().lower()
+            word_entered += letter
             
             if letter == self.correct_word[idx]:
                 self.grid_labels[i].setProperty("state", "correct")
-            elif letter in self.correct_word and letter != self.correct_word[idx]:
+                available_letters[idx] = None
+
+        
+        for i in range(start_idx, end_idx):
+            idx = i - start_idx
+            
+            if self.grid_labels[i].property("state") == "correct":
+                continue
+            
+            letter = self.grid_labels[i].text().lower()
+            
+            if letter in available_letters:
                 self.grid_labels[i].setProperty("state", "placement")
+                available_letters[available_letters.index(letter)] = None
             else:
                 self.grid_labels[i].setProperty("state", "wrong")
-            
+        
+        for i in range(start_idx, end_idx):
             self.grid_labels[i].style().polish(self.grid_labels[i])
-            word_entered += letter
             
         if word_entered == self.correct_word:
             print("You guessed correctly!")
@@ -222,8 +238,6 @@ class MainWindow(QMainWindow):
         elif self.grid_labels[-1].text() != "":
             print(f"Today's word was: {self.correct_word}")
             self.game_finished = True
-        else:
-            word_entered = ""
 
 
     def showInvalidWord(self):
@@ -252,7 +266,7 @@ class MainWindow(QMainWindow):
             if self.grid_labels[i].property("state") == "invalid":
                 self.grid_labels[i].setProperty("state", "filled")
                 self.grid_labels[i].style().polish(self.grid_labels[i])
-                
+
         self.invalid_word = False
 
     
