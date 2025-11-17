@@ -57,7 +57,6 @@ class MainWindow(QMainWindow):
                 border: 2px solid #555555;
                 color: white;
                 background-color: #383838;
-                font: bold 28pt "Arial";
             }
             QLabel[state="filled"] {
                 border: 2px solid white;
@@ -90,17 +89,17 @@ class MainWindow(QMainWindow):
 
 
         self.wordzy_container = QWidget()
-        wordzy_layout = QVBoxLayout(self.wordzy_container)
-        wordzy_layout.setContentsMargins(0, 10, 0, 0)
+        self.wordzy_layout = QVBoxLayout(self.wordzy_container)
+        self.wordzy_layout.setContentsMargins(0, 10, 0, 0)
 
         self.wordzy_label = QLabel("WordZy", self.wordzy_container)
         self.wordzy_label.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop)
         self.wordzy_label.setStyleSheet("""
-            font-size: 48px;
+            font-size: 46px;
             font-weight: bold;
             color: white;
         """)
-        wordzy_layout.addWidget(self.wordzy_label)
+        self.wordzy_layout.addWidget(self.wordzy_label)
 
 
         self.main_layout.addWidget(self.title_bar_container)
