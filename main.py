@@ -44,7 +44,7 @@ class MainWindow(QMainWindow):
         
 
         self.last_words = self.getLastWords()
-        print(f"Yesterdays word: {self.last_words[-1]}")
+        print(f"Yesterdays word: {self.last_words[0]}")
         print(f"Last seven days: {self.last_words}")
 
 
@@ -57,6 +57,7 @@ class MainWindow(QMainWindow):
                 border: 2px solid #555555;
                 color: white;
                 background-color: #383838;
+                font: bold 32px Arial;
             }
             QLabel[state="filled"] {
                 border: 2px solid white;
