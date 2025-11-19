@@ -92,19 +92,27 @@ class MainWindow(QMainWindow):
         self.middle_layout = QHBoxLayout(self.middle_container)
         self.middle_layout.setContentsMargins(0, 0, 0, 0)
 
+
+        self.left_container = QWidget()
+        self.left_layout = QVBoxLayout(self.left_container)
         self.left_widget = QLabel("Left panel")
         self.left_widget.setStyleSheet("color: white; font-size: 20px;")
         self.left_widget.setAlignment(Qt.AlignmentFlag.AlignHCenter)
         self.left_widget.setContentsMargins(40, 0, 0, 0)
+        self.left_layout.addWidget(self.left_widget)
 
+
+        self.right_container = QWidget()
+        self.right_layout = QVBoxLayout(self.right_container)
         self.right_widget = QLabel("Right panel")
         self.right_widget.setStyleSheet("color: white; font-size: 20px;")
         self.right_widget.setAlignment(Qt.AlignmentFlag.AlignHCenter)
         self.right_widget.setContentsMargins(0, 0, 40, 0)
+        self.right_layout.addWidget(self.right_widget)
 
         self.middle_layout.addWidget(self.left_widget)
         self.middle_layout.addWidget(self.grid_container)
-        self.middle_layout.addWidget(self.right_widget)
+        self.middle_layout.addWidget(self.right_container)
 
 
         self.wordzy_container = QWidget()
