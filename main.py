@@ -44,7 +44,6 @@ class MainWindow(QMainWindow):
         
 
         self.last_words = self.getLastWords()
-        print(f"Yesterdays word: {self.last_words[0]}")
         print(f"Last seven days: {self.last_words}")
 
 
@@ -56,7 +55,7 @@ class MainWindow(QMainWindow):
             QLabel {
                 border: 2px solid #555555;
                 color: white;
-                background-color: #383838;
+                background-color: #474747;
                 font: bold 32px Arial;
             }
             QLabel[state="filled"] {
@@ -89,6 +88,25 @@ class MainWindow(QMainWindow):
         self.GRID_COLS = 5
 
 
+        self.middle_container = QWidget()
+        self.middle_layout = QHBoxLayout(self.middle_container)
+        self.middle_layout.setContentsMargins(0, 0, 0, 0)
+
+        self.left_widget = QLabel("Left panel")
+        self.left_widget.setStyleSheet("color: white; font-size: 20px;")
+        self.left_widget.setAlignment(Qt.AlignmentFlag.AlignHCenter)
+        self.left_widget.setContentsMargins(40, 0, 0, 0)
+
+        self.right_widget = QLabel("Right panel")
+        self.right_widget.setStyleSheet("color: white; font-size: 20px;")
+        self.right_widget.setAlignment(Qt.AlignmentFlag.AlignHCenter)
+        self.right_widget.setContentsMargins(0, 0, 40, 0)
+
+        self.middle_layout.addWidget(self.left_widget)
+        self.middle_layout.addWidget(self.grid_container)
+        self.middle_layout.addWidget(self.right_widget)
+
+
         self.wordzy_container = QWidget()
         self.wordzy_layout = QVBoxLayout(self.wordzy_container)
         self.wordzy_layout.setContentsMargins(0, 10, 0, 0)
@@ -105,13 +123,13 @@ class MainWindow(QMainWindow):
 
         self.main_layout.addWidget(self.title_bar_container)
         self.main_layout.addWidget(self.wordzy_container)
-        self.main_layout.addWidget(self.grid_container)
-
+        self.main_layout.addWidget(self.middle_container)
         
+
         self.addToTitleBar()
         self.createGrid()
 
-        self.main_layout.addStretch()   # adds space for remaining content
+        self.main_layout.addStretch()
 
 
     def loadValidWords(self):
