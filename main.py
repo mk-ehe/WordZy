@@ -92,17 +92,32 @@ class MainWindow(QMainWindow):
         self.middle_layout = QHBoxLayout(self.middle_container)
         self.middle_layout.setContentsMargins(0, 0, 0, 0)
 
-
+        #TODO add horizontal layout to there will be date next to word 
         self.left_container = QWidget()
+        self.left_container.setStyleSheet("""
+            background-color: #282828;  
+            border: 1px solid #555555;  
+            border-radius: 10px;         
+            padding-top: 1px;
+            padding-bottom: 2px;               
+        """)
+        self.left_container.setFixedSize(170,280)
         self.left_layout = QVBoxLayout(self.left_container)
-        self.left_widget = QLabel("Left panel")
-        self.left_widget.setStyleSheet("color: white; font-size: 20px;")
-        self.left_widget.setAlignment(Qt.AlignmentFlag.AlignHCenter)
-        self.left_widget.setContentsMargins(40, 0, 0, 0)
-        self.left_layout.addWidget(self.left_widget)
+        self.left_container.setContentsMargins(0, 0, 0, 0)
+        self.left_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        for i in self.last_words:
+            self.left_widget = QLabel(i.upper())
+            self.left_widget.setStyleSheet("color: white; font-size: 20px; background-color: #808080")
+            self.left_widget.setAlignment(Qt.AlignmentFlag.AlignHCenter)
+            self.left_widget.setContentsMargins(0, 0, 0, 0)
+            self.left_widget.setFixedWidth(150)
+            self.left_layout.addWidget(self.left_widget)
+        self.left_layout.addStretch()
 
 
         self.right_container = QWidget()
+        self.right_container.setFixedSize(180, 280)
         self.right_layout = QVBoxLayout(self.right_container)
         self.right_widget = QLabel("Right panel")
         self.right_widget.setStyleSheet("color: white; font-size: 20px;")
@@ -110,9 +125,13 @@ class MainWindow(QMainWindow):
         self.right_widget.setContentsMargins(0, 0, 40, 0)
         self.right_layout.addWidget(self.right_widget)
 
-        self.middle_layout.addWidget(self.left_widget)
+        self.middle_layout.addStretch(1)
+        self.middle_layout.addWidget(self.left_container)
+        self.middle_layout.addStretch(1)
         self.middle_layout.addWidget(self.grid_container)
+        self.middle_layout.addStretch(1)
         self.middle_layout.addWidget(self.right_container)
+        self.middle_layout.addStretch(1)
 
 
         self.wordzy_container = QWidget()
