@@ -43,10 +43,6 @@ class MainWindow(QMainWindow):
         self.game_finished = False
         
 
-        self.last_words = self.getLastWords()
-        print(f"Last seven days: {self.last_words}")
-
-
         self.grid_container = QWidget()
         self.grid_layout = QGridLayout(self.grid_container)
         self.grid_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -92,7 +88,7 @@ class MainWindow(QMainWindow):
         self.middle_layout = QHBoxLayout(self.middle_container)
         self.middle_layout.setContentsMargins(0, 0, 0, 0)
 
-        #TODO add horizontal layout to there will be date next to word 
+
         self.left_container = QWidget()
         self.left_container.setStyleSheet("""
             background-color: #282828;  
@@ -102,28 +98,43 @@ class MainWindow(QMainWindow):
             padding-bottom: 2px;               
         """)
         self.left_container.setFixedSize(170,280)
-        self.left_layout = QVBoxLayout(self.left_container)
         self.left_container.setContentsMargins(0, 0, 0, 0)
+        self.left_layout = QVBoxLayout(self.left_container)
+        self.left_layout.setSpacing(5)
         self.left_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        
+        self.last_words = self.getLastWords()
+        self.last_seven_text = QLabel("Last 7 words")
+        self.last_seven_text.setStyleSheet("")
+        self.last_seven_text.setStyleSheet("""
+            color: white;
+            border: none;
+            font: bold 18px Arial 
+        """)
+        self.last_seven_text.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.left_layout.addWidget(self.last_seven_text)
 
-        for i in self.last_words:
-            self.left_widget = QLabel(i.upper())
-            self.left_widget.setStyleSheet("color: white; font-size: 20px; background-color: #808080")
-            self.left_widget.setAlignment(Qt.AlignmentFlag.AlignHCenter)
-            self.left_widget.setContentsMargins(0, 0, 0, 0)
+        for i, word in enumerate(self.last_words):
+            self.left_widget = QLabel(word.upper())
+            if i != 0:
+                self.left_widget.setStyleSheet("color: white; font: bold 22px Arial; background-color: #808080;")
+            else:
+                self.left_widget.setStyleSheet("color: white; font: bold 22px Arial; background-color: #00aaed;")
+            self.left_widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            self.left_widget.setContentsMargins(0, 2, 0, 0)
             self.left_widget.setFixedWidth(150)
             self.left_layout.addWidget(self.left_widget)
-        self.left_layout.addStretch()
 
 
         self.right_container = QWidget()
-        self.right_container.setFixedSize(180, 280)
+        self.right_container.setFixedSize(170, 280)
         self.right_layout = QVBoxLayout(self.right_container)
         self.right_widget = QLabel("Right panel")
         self.right_widget.setStyleSheet("color: white; font-size: 20px;")
         self.right_widget.setAlignment(Qt.AlignmentFlag.AlignHCenter)
         self.right_widget.setContentsMargins(0, 0, 40, 0)
         self.right_layout.addWidget(self.right_widget)
+        
 
         self.middle_layout.addStretch(1)
         self.middle_layout.addWidget(self.left_container)
