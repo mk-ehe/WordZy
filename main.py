@@ -95,9 +95,10 @@ class MainWindow(QMainWindow):
             border: 1px solid #555555;  
             border-radius: 10px;         
             padding-top: 1px;
-            padding-bottom: 2px;               
+            padding-bottom: 2px;
+            margin-left: 15px;
         """)
-        self.left_container.setFixedSize(170,280)
+        self.left_container.setFixedSize(175, 280)
         self.left_container.setContentsMargins(0, 0, 0, 0)
         self.left_layout = QVBoxLayout(self.left_container)
         self.left_layout.setSpacing(5)
@@ -127,12 +128,12 @@ class MainWindow(QMainWindow):
 
 
         self.right_container = QWidget()
-        self.right_container.setFixedSize(170, 280)
+        self.right_container.setFixedSize(175, 280)
         self.right_layout = QVBoxLayout(self.right_container)
         self.right_widget = QLabel("Right panel")
         self.right_widget.setStyleSheet("color: white; font-size: 20px;")
         self.right_widget.setAlignment(Qt.AlignmentFlag.AlignHCenter)
-        self.right_widget.setContentsMargins(0, 0, 40, 0)
+        self.right_widget.setContentsMargins(0, 0, 20, 0)
         self.right_layout.addWidget(self.right_widget)
         
 
@@ -159,10 +160,21 @@ class MainWindow(QMainWindow):
         self.wordzy_layout.addWidget(self.wordzy_label)
 
 
+        self.keyboard_rows = [["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
+                               ["A", "S", "D", "F", "G", "H", "J", "K", "L"],
+                               ["Enter","Z", "X", "C", "V", "B", "N", "M", "⌫"]]
+        self.keyboard_container = QWidget()
+        self.keyboard_container.setContentsMargins(0, 48, 0, 0)
+        self.keyboard_main_layout = QVBoxLayout(self.keyboard_container) 
+        self.keyboard_main_layout.setSpacing(5)
+        self.keyboard_main_layout.setAlignment(Qt.AlignmentFlag.AlignHCenter)
+        self.createKeyboard()
+
+
         self.main_layout.addWidget(self.title_bar_container)
         self.main_layout.addWidget(self.wordzy_container)
         self.main_layout.addWidget(self.middle_container)
-        
+        self.main_layout.addWidget(self.keyboard_container)
 
         self.addToTitleBar()
         self.createGrid()
@@ -277,6 +289,39 @@ class MainWindow(QMainWindow):
                     label.setProperty("state", "filled" if label.text() else "empty")
                 
                 label.style().polish(label)
+
+
+    def createKeyboard(self):
+        for rows in self.keyboard_rows:
+            self.row_container = QWidget()
+            self.row_layout = QHBoxLayout(self.row_container)
+            self.row_layout.setContentsMargins(0, 0, 0, 0)
+            self.row_layout.setSpacing(5)
+            self.row_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            for text in rows:
+                self.button = QPushButton(text)
+                font_size = "20px"
+                padding_bottom = "4px"
+
+                if text == "Enter" or text == "⌫":
+                    self.button.setFixedSize(76, 50) 
+                    if text == "⌫":
+                        font_size = "30px"
+                        padding_bottom = "6px"
+                else:
+                    self.button.setFixedSize(46, 50)
+
+                self.button.setStyleSheet(f"""
+                    background-color: #555555;
+                    color: white;
+                    border: 0px;
+                    border-radius: 4px;
+                    font: bold Arial;
+                    font-size: {font_size} !important;
+                    padding-bottom: {padding_bottom};
+                    """)
+                self.row_layout.addWidget(self.button)
+            self.keyboard_main_layout.addWidget(self.row_container)
 
     
     def checkCorrectLetters(self):
