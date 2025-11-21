@@ -114,17 +114,7 @@ class MainWindow(QMainWindow):
         """)
         self.last_seven_text.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.left_layout.addWidget(self.last_seven_text)
-
-        for i, word in enumerate(self.last_words):
-            self.left_widget = QLabel(word.upper())
-            if i != 0:
-                self.left_widget.setStyleSheet("color: white; font: bold 22px Arial; background-color: #808080;")
-            else:
-                self.left_widget.setStyleSheet("color: white; font: bold 22px Arial; background-color: #00aaed;")
-            self.left_widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            self.left_widget.setContentsMargins(0, 2, 0, 0)
-            self.left_widget.setFixedWidth(150)
-            self.left_layout.addWidget(self.left_widget)
+        self.addLastWords()
 
 
         self.right_container = QWidget()
@@ -289,6 +279,19 @@ class MainWindow(QMainWindow):
                     label.setProperty("state", "filled" if label.text() else "empty")
                 
                 label.style().polish(label)
+
+
+    def addLastWords(self):
+        for i, word in enumerate(self.last_words):
+            self.left_widget = QLabel(word.upper())
+            if i != 0:
+                self.left_widget.setStyleSheet("color: white; font: bold 22px Arial; background-color: #808080;")
+            else:
+                self.left_widget.setStyleSheet("color: white; font: bold 22px Arial; background-color: #00aaed;")
+            self.left_widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            self.left_widget.setContentsMargins(0, 2, 0, 0)
+            self.left_widget.setFixedWidth(150)
+            self.left_layout.addWidget(self.left_widget)
 
 
     def createKeyboard(self):
