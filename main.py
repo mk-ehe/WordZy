@@ -12,7 +12,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setGeometry(390, 140, 1200, 750)
         self.setStyleSheet("""background-color: #383838;""")
-        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)  # deletes default title bar
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowMinimizeButtonHint)
 
         self._drag_position = QPoint()
         self._dragging = False
@@ -93,7 +93,7 @@ class MainWindow(QMainWindow):
         self.left_container.setStyleSheet("""
             background-color: #282828;  
             border: 1px solid #555555;  
-            border-radius: 10px;         
+            border-radius: 10px;        
             padding-top: 1px;
             padding-bottom: 2px;
             margin-left: 15px;
@@ -151,8 +151,12 @@ class MainWindow(QMainWindow):
 
 
         self.keyboard_rows = [["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
-                               ["A", "S", "D", "F", "G", "H", "J", "K", "L"],
-                               ["Enter","Z", "X", "C", "V", "B", "N", "M", "⌫"]]
+                              ["A", "S", "D", "F", "G", "H", "J", "K", "L"],
+                              ["Enter","Z", "X", "C", "V", "B", "N", "M", "⌫"]]
+        self.keyboard_letters = [letter for row in self.keyboard_rows for letter in row if (letter.isalpha() and len(letter) == 1)]
+        self.keyboard_status = {letter: "default" for letter in self.keyboard_letters}
+        self.keyboard_qbuttons = {}
+
         self.keyboard_container = QWidget()
         self.keyboard_container.setContentsMargins(0, 48, 0, 0)
         self.keyboard_main_layout = QVBoxLayout(self.keyboard_container) 
@@ -175,7 +179,7 @@ class MainWindow(QMainWindow):
     def loadValidWords(self):
         try:
             response = requests.get("https://gist.githubusercontent.com/cfreshman/a03ef2cba789d8cf00c08f767e0fad7b/raw/wordle-answers-alphabetical.txt")
-            words = response.text.strip().split('\n')
+            words = response.text.strip().split("\n")
             return [w.lower().strip() for w in words if w.strip()]
         except:
             return ["error"]
@@ -195,7 +199,7 @@ class MainWindow(QMainWindow):
             last_words.append(self.getDailyWord(i))
         return last_words
         
-        
+    
     def isValidWord(self, word):
         return word.lower() in self.valid_words
 
@@ -203,28 +207,28 @@ class MainWindow(QMainWindow):
     def addToTitleBar(self):
         title_label = QLabel("WordZy", self)
         title_label.setStyleSheet("""color: white;
-                                  font-weight: bold;
-                                  padding-left: 4px;
-                                  padding-bottom: 2px""")
+                                     font-weight: bold;
+                                     padding-left: 4px;
+                                     padding-bottom: 2px""")
         
-        close_button = QPushButton('✖', self)
+        close_button = QPushButton("✖", self)
         close_button.setStyleSheet("""QPushButton{ color: white;
-                                        border: 0px;
-                                        font-size: 14px;
-                                        padding-bottom: 2px
-                                   }
-                                   QPushButton:hover {
-                                        background-color: red;
-                                        }
-                                   """)
-        minimize_button = QPushButton('—', self)
+                                     border: 0px;
+                                     font-size: 14px;
+                                     padding-bottom: 2px
+                                }
+                                 QPushButton:hover {
+                                     background-color: red;
+                                     }
+                                """)
+        minimize_button = QPushButton("—", self)
         minimize_button.setStyleSheet("""QPushButton{ color: white;
-                                        border: 0px;
-                                        font-size: 12px;
-                                   }
-                                    QPushButton:hover {
-                                        background-color: #3d3d3d;}
-                                    """)
+                                     border: 0px;
+                                     font-size: 12px;
+                                }
+                                 QPushButton:hover {
+                                     background-color: #3d3d3d;}
+                                 """)
 
         close_button.setFixedSize(26, 26)
         minimize_button.setFixedSize(26, 26)
@@ -313,6 +317,7 @@ class MainWindow(QMainWindow):
                         padding_bottom = "6px"
                 else:
                     self.button.setFixedSize(46, 50)
+                    self.keyboard_qbuttons[text] = self.button
 
                 self.button.setStyleSheet(f"""
                     background-color: #555555;
@@ -326,6 +331,29 @@ class MainWindow(QMainWindow):
                 self.row_layout.addWidget(self.button)
             self.keyboard_main_layout.addWidget(self.row_container)
 
+
+    def updateKeyboardColors(self):
+        color_map = {
+            "correct": "#00d90b",
+            "placement": "#f2d202",
+            "wrong": "#1c1c1c",  
+            "default": "#555555"
+        }
+        
+        for letter, status in self.keyboard_status.items():
+            button = self.keyboard_qbuttons.get(letter)
+            if button:
+                color = color_map.get(status, "#555555")
+                button.setStyleSheet(f"""
+                    background-color: {color};
+                    color: white;
+                    border: 0px;
+                    border-radius: 4px;
+                    font: bold Arial;
+                    font-size: 20px !important;
+                    padding-bottom: 4px;
+                    """)
+
     
     def checkCorrectLetters(self):
         word_entered = ""
@@ -333,31 +361,40 @@ class MainWindow(QMainWindow):
         end_idx = start_idx + self.GRID_COLS
 
         available_letters = list(self.correct_word)
+        current_row_letters = []
         
         for i in range(start_idx, end_idx):
             idx = i - start_idx
             letter = self.grid_labels[i].text().lower()
             word_entered += letter
+            current_row_letters.append(letter)
             
             if letter == self.correct_word[idx]:
                 self.grid_labels[i].setProperty("state", "correct")
                 available_letters[idx] = None
+                self.keyboard_status[letter.upper()] = "correct"
 
         
         for i in range(start_idx, end_idx):
             idx = i - start_idx
-            
+            letter = self.grid_labels[i].text().lower()
+            key_letter_upper = letter.upper()
+
             if self.grid_labels[i].property("state") == "correct":
                 continue
-            
-            letter = self.grid_labels[i].text().lower()
             
             if letter in available_letters:
                 self.grid_labels[i].setProperty("state", "placement")
                 available_letters[available_letters.index(letter)] = None
+                if self.keyboard_status.get(key_letter_upper) != "correct":
+                    self.keyboard_status[key_letter_upper] = "placement"
             else:
                 self.grid_labels[i].setProperty("state", "wrong")
-        
+                if self.keyboard_status.get(key_letter_upper) not in ["correct", "placement"]:
+                    self.keyboard_status[key_letter_upper] = "wrong"
+
+        self.updateKeyboardColors()
+
         for i in range(start_idx, end_idx):
             self.grid_labels[i].style().polish(self.grid_labels[i])
             
@@ -367,6 +404,8 @@ class MainWindow(QMainWindow):
         elif self.grid_labels[-1].text() != "":
             print(f"Today's word was: {self.correct_word}")
             self.game_finished = True
+
+        # return word_entered == self.correct_word  # might be useful later
 
 
     def showInvalidWord(self):
@@ -384,7 +423,7 @@ class MainWindow(QMainWindow):
         if self.invalid_timer.isActive():
             self.invalid_timer.stop()
 
-        self.invalid_timer.start(1100)
+        self.invalid_timer.start(1000)
 
 
     def resetInvalidWord(self):
@@ -441,7 +480,7 @@ class MainWindow(QMainWindow):
                     self.setActiveCell()
 
 
-    def mousePressEvent(self, event: QMouseEvent):        
+    def mousePressEvent(self, event: QMouseEvent):         
         if event.button() == Qt.MouseButton.LeftButton:
             local_pos_int = event.position().toPoint() 
             global_click_pos = self.mapToGlobal(local_pos_int)
