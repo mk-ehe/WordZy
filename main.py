@@ -349,56 +349,51 @@ class MainWindow(QMainWindow):
             "wrong": "#1c1c1c",  
             "default": "#555555"
         }
+
+        hover_map = {
+            "correct": "#00e900",
+            "placement": "#eece00",
+            "wrong": "#252525",  
+            "default": "#5c5c5c"
+        }
+
+        pressed_map = {
+            "correct": "#00ff00",
+            "placement": "#ffdd00",
+            "wrong": "#2C2C2C",  
+            "default": "#6a6a6a"
+        }
+
         for letter, status in self.keyboard_status.items():
             button = self.keyboard_qbuttons.get(letter)
             if button:
-                if letter == flash_letter and status == "default":
-                    color = "#6a6a6a"
-                elif letter == flash_letter and status == "correct":
-                    color = "#00ff00"
-                elif letter == flash_letter and status == "placement":
-                    color = "#fcdb03"
-                elif letter == flash_letter and status == "wrong":
-                    color = "#2C2C2C"
-                else:
-                    color = color_map.get(status, "#555555")
-
+                color = pressed_map[status] if letter == flash_letter else color_map[status]
+                hover_color = hover_map[status]
+                pressed_color = pressed_map[status]
+                
+                font_size = "20px"
+                padding_bottom = "4px"
                 if letter == "⌫":
-                    button.setStyleSheet(f"""
-                        QPushButton {{
-                            background-color: {color};
-                            color: white;
-                            border: 0px;
-                            border-radius: 4px;
-                            font: bold Arial;
-                            font-size: 30px !important;
-                            padding-bottom: 6px;
-                        }}
-                        QPushButton:hover {{            
-                            background-color: #5c5c5c;
-                        }}                                  
-                        QPushButton:pressed {{
-                            background-color: #6a6a6a;
-                        }}
-                        """)    #muszą tu być bo jak się wywoła funkcja to przestanie dzialać
-                else:
-                    button.setStyleSheet(f"""
-                        QPushButton {{
-                            background-color: {color};
-                            color: white;
-                            border: 0px;
-                            border-radius: 4px;
-                            font: bold Arial;
-                            font-size: 20px !important;
-                            padding-bottom: 4px;
-                        }}
-                        QPushButton:hover {{            
-                            background-color: #5c5c5c;
-                        }}                                  
-                        QPushButton:pressed {{
-                            background-color: #6a6a6a;
-                        }}
-                        """)
+                    font_size = "30px"
+                    padding_bottom = "6px"
+
+                button.setStyleSheet(f"""
+                    QPushButton {{
+                        background-color: {color};
+                        color: white;
+                        border: 0px;
+                        border-radius: 4px;
+                        font: bold Arial;
+                        font-size: {font_size} !important;
+                        padding-bottom: {padding_bottom};
+                    }}
+                    QPushButton:hover {{            
+                        background-color: {hover_color};
+                    }}                                  
+                    QPushButton:pressed {{
+                        background-color: {pressed_color};
+                    }}
+                    """)
 
     
     def checkCorrectLetters(self):
@@ -508,11 +503,12 @@ class MainWindow(QMainWindow):
                 self.setActiveCell()
 
         elif key == Qt.Key.Key_Return or key == Qt.Key.Key_Enter:
-            if event.isAutoRepeat():
-                self.showInvalidWord()
-                return
-
             if self.current_col == 5 and self.current_row < 6:
+
+                if event.isAutoRepeat():
+                    self.showInvalidWord()
+                    return
+                
                 start_idx = self.current_row * self.GRID_COLS
                 word_entered = ""
                 for i in range(start_idx, start_idx + self.GRID_COLS):
@@ -530,8 +526,11 @@ class MainWindow(QMainWindow):
 
                 if not self.game_finished:
                     self.setActiveCell()
-            self.updateKeyboardColors(flash_letter="Enter")
-            QTimer.singleShot(100, lambda: self.updateKeyboardColors())
+
+                self.updateKeyboardColors(flash_letter="Enter")
+                QTimer.singleShot(100, lambda: self.updateKeyboardColors())
+            else:
+                return
 
 
     def mousePressEvent(self, event: QMouseEvent):         
