@@ -308,20 +308,21 @@ class MainWindow(QMainWindow):
             self.row_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
             for text in rows:
-                self.button = QPushButton(text)
+                button = QPushButton(text)
+                button.clicked.connect(lambda _, t=text: self.handleButtonClick(t))
                 font_size = "20px"
                 padding_bottom = "4px"
 
                 if text == "Enter" or text == "⌫":
-                    self.button.setFixedSize(76, 50) 
+                    button.setFixedSize(76, 50) 
                     if text == "⌫":
                         font_size = "30px"
                         padding_bottom = "6px"
                 else:
-                    self.button.setFixedSize(46, 50)
-                self.keyboard_qbuttons[text] = self.button
+                    button.setFixedSize(46, 50)
+                self.keyboard_qbuttons[text] = button
 
-                self.button.setStyleSheet(f"""
+                button.setStyleSheet(f"""
                     QPushButton{{
                         background-color: #555555;
                         color: white;
@@ -338,7 +339,7 @@ class MainWindow(QMainWindow):
                         background-color: #6a6a6a;
                     }}
                     """)
-                self.row_layout.addWidget(self.button)
+                self.row_layout.addWidget(button)
             self.keyboard_main_layout.addWidget(self.row_container)
 
 
@@ -394,6 +395,50 @@ class MainWindow(QMainWindow):
                         background-color: {pressed_color};
                     }}
                     """)
+                
+
+    def handleButtonClick(self, text):
+        if self.game_finished:
+            return
+        
+        if text.isalpha() and len(text) == 1:
+            if self.current_col < 5:
+                self.updateKeyboardColors(flash_letter=text)
+                QTimer.singleShot(100, lambda: self.updateKeyboardColors())
+                self.updateGridCell(text)
+                self.current_col += 1
+                self.setActiveCell()
+        
+        elif text == "⌫":
+            if self.current_col > 0:
+                self.updateKeyboardColors(flash_letter="⌫")
+                QTimer.singleShot(100, lambda: self.updateKeyboardColors())
+                self.current_col -= 1
+                self.updateGridCell("")
+                self.setActiveCell()
+        
+        elif text == "Enter":
+            if self.current_col == 5 and self.current_row < 6:
+                start_idx = self.current_row * self.GRID_COLS
+                word_entered = ""
+                for i in range(start_idx, start_idx + self.GRID_COLS):
+                    word_entered += self.grid_labels[i].text().lower()
+
+                if not self.isValidWord(word_entered):
+                    self.updateKeyboardColors(flash_letter="Enter")
+                    QTimer.singleShot(100, lambda: self.updateKeyboardColors())
+                    self.showInvalidWord()
+                    return
+
+                self.checkCorrectLetters()
+                self.current_row += 1
+                self.current_col = 0
+
+                if not self.game_finished:
+                    self.setActiveCell()
+
+                self.updateKeyboardColors(flash_letter="Enter")
+                QTimer.singleShot(100, lambda: self.updateKeyboardColors())
 
     
     def checkCorrectLetters(self):
