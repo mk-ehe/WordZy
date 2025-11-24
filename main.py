@@ -162,14 +162,15 @@ class MainWindow(QMainWindow):
         self.keyboard_main_layout = QVBoxLayout(self.keyboard_container) 
         self.keyboard_main_layout.setSpacing(5)
         self.keyboard_main_layout.setAlignment(Qt.AlignmentFlag.AlignHCenter)
-        self.createKeyboard()
-
+        
 
         self.main_layout.addWidget(self.title_bar_container)
         self.main_layout.addWidget(self.wordzy_container)
         self.main_layout.addWidget(self.middle_container)
         self.main_layout.addWidget(self.keyboard_container)
 
+
+        self.createKeyboard()
         self.addToTitleBar()
         self.createGrid()
 
@@ -185,7 +186,7 @@ class MainWindow(QMainWindow):
             return ["error"]
 
 
-    def getDailyWord(self, rewind = 0):
+    def getDailyWord(self, rewind=0):
         today = datetime.now().date()
         seed = int(today.strftime("%Y%m%d"))
         random.seed(seed - rewind)
@@ -305,6 +306,7 @@ class MainWindow(QMainWindow):
             self.row_layout.setContentsMargins(0, 0, 0, 0)
             self.row_layout.setSpacing(5)
             self.row_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
             for text in rows:
                 self.button = QPushButton(text)
                 font_size = "20px"
@@ -320,13 +322,21 @@ class MainWindow(QMainWindow):
                     self.keyboard_qbuttons[text] = self.button
 
                 self.button.setStyleSheet(f"""
-                    background-color: #555555;
-                    color: white;
-                    border: 0px;
-                    border-radius: 4px;
-                    font: bold Arial;
-                    font-size: {font_size} !important;
-                    padding-bottom: {padding_bottom};
+                    QPushButton{{
+                        background-color: #555555;
+                        color: white;
+                        border: 0px;
+                        border-radius: 4px;
+                        font: bold Arial;
+                        font-size: {font_size} !important;
+                        padding-bottom: {padding_bottom};
+                    }}
+                    QPushButton:hover {{            
+                        background-color: #5c5c5c;
+                    }}                                  
+                    QPushButton:pressed {{
+                        background-color: #6a6a6a;
+                    }}
                     """)
                 self.row_layout.addWidget(self.button)
             self.keyboard_main_layout.addWidget(self.row_container)
@@ -345,6 +355,7 @@ class MainWindow(QMainWindow):
             if button:
                 color = color_map.get(status, "#555555")
                 button.setStyleSheet(f"""
+                QPushButton {{
                     background-color: {color};
                     color: white;
                     border: 0px;
@@ -352,7 +363,14 @@ class MainWindow(QMainWindow):
                     font: bold Arial;
                     font-size: 20px !important;
                     padding-bottom: 4px;
-                    """)
+                }}#
+                QPushButton:hover {{            
+                    background-color: #5c5c5c;
+                }}                                  
+                QPushButton:pressed {{
+                    background-color: #6a6a6a;
+                }}
+                    """)    #muszą tu być bo jak się wywoła funkcja to przestanie dzialać
 
     
     def checkCorrectLetters(self):
