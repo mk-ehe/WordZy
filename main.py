@@ -493,10 +493,10 @@ class MainWindow(QMainWindow):
             self.grid_labels[i].style().polish(self.grid_labels[i])
             
         if word_entered == self.correct_word:
-            self.changeInfoLabelDaily()
+            self.changeInfoLabelDaily("#00ff00")
             self.game_finished = True
         elif self.grid_labels[-1].text() != "":
-            self.changeInfoLabelDaily()
+            self.changeInfoLabelDaily("white")
             self.game_finished = True
 
 
@@ -506,8 +506,8 @@ class MainWindow(QMainWindow):
         QTimer.singleShot(1000, lambda: self.info_label.setText(""))
 
 
-    def changeInfoLabelDaily(self):
-        self.info_label.setStyleSheet("font: bold 18px Arial; color: #00ff00; padding-top: 10px")
+    def changeInfoLabelDaily(self, color):
+        self.info_label.setStyleSheet(f"font: bold 18px Arial; color: {color}; padding-top: 10px")
         self.info_label.setText(f"Today's word was: {self.correct_word.upper()}")
 
 
