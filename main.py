@@ -61,7 +61,7 @@ class MainWindow(QMainWindow):
                 border: 2px solid #949494;
             }
             QLabel[state="correct"] {
-                border: 2px solid #00c90a;
+                border: 2px solid #00e900;
                 color: #00c90a;
             }
             QLabel[state="wrong"] {
@@ -125,7 +125,7 @@ class MainWindow(QMainWindow):
         self.right_widget.setAlignment(Qt.AlignmentFlag.AlignHCenter)
         self.right_widget.setContentsMargins(0, 0, 20, 0)
         self.right_layout.addWidget(self.right_widget)
-        
+
 
         self.middle_layout.addStretch(1)
         self.middle_layout.addWidget(self.left_container)
@@ -135,11 +135,9 @@ class MainWindow(QMainWindow):
         self.middle_layout.addWidget(self.right_container)
         self.middle_layout.addStretch(1)
 
-
         self.wordzy_container = QWidget()
         self.wordzy_layout = QVBoxLayout(self.wordzy_container)
         self.wordzy_layout.setContentsMargins(0, 10, 0, 0)
-
         self.wordzy_label = QLabel("WordZy", self.wordzy_container)
         self.wordzy_label.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop)
         self.wordzy_label.setStyleSheet("""
@@ -158,15 +156,25 @@ class MainWindow(QMainWindow):
         self.keyboard_qbuttons = {}
 
         self.keyboard_container = QWidget()
-        self.keyboard_container.setContentsMargins(0, 48, 0, 0)
+        self.keyboard_container.setContentsMargins(0, 18, 0, 0)
         self.keyboard_main_layout = QVBoxLayout(self.keyboard_container) 
         self.keyboard_main_layout.setSpacing(5)
         self.keyboard_main_layout.setAlignment(Qt.AlignmentFlag.AlignHCenter)
         
 
+        self.info_label = QLabel("")
+        self.info_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.info_label.setStyleSheet("""
+            font: bold 18px Arial;
+            color: white;
+            padding-top: 10px;
+        """)
+
+
         self.main_layout.addWidget(self.title_bar_container)
         self.main_layout.addWidget(self.wordzy_container)
         self.main_layout.addWidget(self.middle_container)
+        self.main_layout.addWidget(self.info_label)
         self.main_layout.addWidget(self.keyboard_container)
 
 
@@ -485,13 +493,22 @@ class MainWindow(QMainWindow):
             self.grid_labels[i].style().polish(self.grid_labels[i])
             
         if word_entered == self.correct_word:
-            print("You guessed correctly!")
+            self.changeInfoLabelDaily()
             self.game_finished = True
         elif self.grid_labels[-1].text() != "":
-            print(f"Today's word was: {self.correct_word}")
+            self.changeInfoLabelDaily()
             self.game_finished = True
 
-        # return word_entered == self.correct_word  # might be useful later
+
+    def changeInfoLabelInvalid(self):
+        self.info_label.setStyleSheet("font: bold 18px Arial; color: red; padding-top: 10px")
+        self.info_label.setText("Invalid word.")
+        QTimer.singleShot(1000, lambda: self.info_label.setText(""))
+
+
+    def changeInfoLabelDaily(self):
+        self.info_label.setStyleSheet("font: bold 18px Arial; color: #00ff00; padding-top: 10px")
+        self.info_label.setText(f"Today's word was: {self.correct_word.upper()}")
 
 
     def showInvalidWord(self):
@@ -560,6 +577,7 @@ class MainWindow(QMainWindow):
                     word_entered += self.grid_labels[i].text().lower()
 
                 if not self.isValidWord(word_entered):
+                    self.changeInfoLabelInvalid()
                     self.updateKeyboardColors(flash_letter="Enter")
                     QTimer.singleShot(100, lambda: self.updateKeyboardColors())
                     self.showInvalidWord()
