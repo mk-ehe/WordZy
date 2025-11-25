@@ -520,7 +520,6 @@ class MainWindow(QMainWindow):
             self.grid_labels[i].style().polish(self.grid_labels[i])
 
         if not self.invalid_word:
-            print("Invalid word!")
             self.invalid_word = True
 
         if self.invalid_timer.isActive():
