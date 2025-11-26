@@ -39,6 +39,7 @@ class MainWindow(QMainWindow):
         
 
         self.valid_words = self.loadValidWords()
+        self.extra_words = self.loadExtraWords()
         self.correct_word = self.getDailyWord()
         self.game_finished = False
         
@@ -192,6 +193,17 @@ class MainWindow(QMainWindow):
             return [w.lower().strip() for w in words if w.strip()]
         except:
             return ["error"]
+        
+
+    def loadExtraWords(self):
+        try:
+            response = requests.get(
+                "https://raw.githubusercontent.com/tabatkins/wordle-list/main/words"
+            )
+            words = response.text.strip().split("\n")
+            return [w.lower().strip() for w in words if len(w.strip()) == 5]
+        except:
+            return ["error"]
 
 
     def getDailyWord(self, rewind=0):
@@ -210,7 +222,7 @@ class MainWindow(QMainWindow):
         
     
     def isValidWord(self, word):
-        return word.lower() in self.valid_words
+        return word.lower() in self.extra_words
 
 
     def addToTitleBar(self):
