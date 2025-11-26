@@ -70,8 +70,8 @@ class MainWindow(QMainWindow):
                 color: #1c1c1c;
             }
             QLabel[state="placement"] {
-                border: 2px solid #d6ba00;
-                color: #d6ba00;
+                border: 2px solid #ffdd00;
+                color: #ffdd00;
             }
             QLabel[state="invalid"] {
                 border: 2px solid red;
