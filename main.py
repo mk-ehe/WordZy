@@ -3,7 +3,7 @@ from PySide6.QtCore import Qt, QPoint, QTimer
 from PySide6.QtGui import QMouseEvent, QKeyEvent
 import sys
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
 import random
 
 
@@ -207,9 +207,10 @@ class MainWindow(QMainWindow):
 
 
     def getDailyWord(self, rewind=0):
-        today = datetime.now().date()
-        seed = int(today.strftime("%Y%m%d"))
-        random.seed(seed - rewind)
+        today = datetime.now().date()      
+        target_date = today - timedelta(days=rewind)
+        seed = int(target_date.strftime("%Y%m%d"))
+        random.seed(seed)
         daily_word = random.choice(self.valid_words)
         return daily_word
     
@@ -258,7 +259,7 @@ class MainWindow(QMainWindow):
         minimize_button.clicked.connect(self.showMinimized)
 
         self.title_bar.addWidget(title_label)
-        self.title_bar.addStretch()    # pushes everything to the right
+        self.title_bar.addStretch()
         
         self.title_bar.addWidget(minimize_button)
         self.title_bar.addWidget(close_button)
