@@ -446,6 +446,7 @@ class MainWindow(QMainWindow):
                     word_entered += self.grid_labels[i].text().lower()
 
                 if not self.isValidWord(word_entered):
+                    self.changeInfoLabelInvalid()
                     self.updateKeyboardColors(flash_letter="Enter")
                     QTimer.singleShot(100, lambda: self.updateKeyboardColors())
                     self.showInvalidWord()
