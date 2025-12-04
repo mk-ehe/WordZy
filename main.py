@@ -1,10 +1,12 @@
-from PySide6.QtWidgets import QMainWindow, QApplication, QLabel, QHBoxLayout, QPushButton, QWidget, QVBoxLayout, QGridLayout
+from PySide6.QtWidgets import QMainWindow, QApplication, QLabel, QHBoxLayout, QPushButton, QWidget, QVBoxLayout, QGridLayout, QStackedWidget
 from PySide6.QtCore import Qt, QPoint, QTimer
 from PySide6.QtGui import QMouseEvent, QKeyEvent
 import sys
 import requests
 from datetime import datetime, timedelta
 import random
+
+from Entry import EntryScreen
 
 
 class MainWindow(QMainWindow):
@@ -25,10 +27,10 @@ class MainWindow(QMainWindow):
 
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
-        self.main_layout = QVBoxLayout(self.central_widget)
-        self.main_layout.setContentsMargins(0, 0, 0, 0)
-        self.main_layout.setSpacing(0)
-        
+        self.base_layout = QVBoxLayout(self.central_widget)
+        self.base_layout.setContentsMargins(0, 0, 0, 0)
+        self.base_layout.setSpacing(0)
+
 
         self.title_bar_container = QWidget()
         self.title_bar_container.setFixedHeight(26)
@@ -36,6 +38,22 @@ class MainWindow(QMainWindow):
         self.title_bar = QHBoxLayout(self.title_bar_container)
         self.title_bar.setContentsMargins(0, 0, 0, 0)
         self.title_bar.setSpacing(0)
+        self.base_layout.addWidget(self.title_bar_container)
+
+
+        self.stack = QStackedWidget()
+        self.base_layout.addWidget(self.stack)
+
+        self.login_screen = EntryScreen()
+        self.login_screen.login_successful.connect(self.showGame)
+        self.stack.addWidget(self.login_screen)
+
+
+        self.game_container = QWidget()
+        self.game_layout = QVBoxLayout(self.game_container)
+        self.game_layout.setContentsMargins(0, 0, 0, 0)
+        self.game_layout.setSpacing(0)
+        self.stack.addWidget(self.game_container)
         
 
         self.valid_words = self.loadValidWords()
@@ -172,18 +190,22 @@ class MainWindow(QMainWindow):
         """)
 
 
-        self.main_layout.addWidget(self.title_bar_container)
-        self.main_layout.addWidget(self.wordzy_container)
-        self.main_layout.addWidget(self.middle_container)
-        self.main_layout.addWidget(self.info_label)
-        self.main_layout.addWidget(self.keyboard_container)
+        self.game_layout.addWidget(self.wordzy_container)
+        self.game_layout.addWidget(self.middle_container)
+        self.game_layout.addWidget(self.info_label)
+        self.game_layout.addWidget(self.keyboard_container)
 
 
         self.createKeyboard()
         self.addToTitleBar()
         self.createGrid()
 
-        self.main_layout.addStretch()
+        self.game_layout.addStretch()
+
+
+    def showGame(self):
+        self.stack.setCurrentIndex(1)
+        self.setFocus()
 
 
     def loadValidWords(self):
@@ -238,19 +260,19 @@ class MainWindow(QMainWindow):
                                      border: 0px;
                                      font-size: 14px;
                                      padding-bottom: 2px
-                                }
-                                 QPushButton:hover {
-                                     background-color: red;
-                                     }
-                                """)
+                                    }
+                                    QPushButton:hover {
+                                        background-color: red;
+                                        }
+                                    """)
         minimize_button = QPushButton("—", self)
         minimize_button.setStyleSheet("""QPushButton{ color: white;
                                      border: 0px;
                                      font-size: 12px;
-                                }
-                                 QPushButton:hover {
-                                     background-color: #3d3d3d;}
-                                 """)
+                                    }
+                                    QPushButton:hover {
+                                        background-color: #3d3d3d;}
+                                    """)
 
         close_button.setFixedSize(26, 26)
         minimize_button.setFixedSize(26, 26)
@@ -380,8 +402,8 @@ class MainWindow(QMainWindow):
         }
 
         pressed_map = {
-            "correct": "#00ff00",
-            "placement": "#ffdd00",
+            "correct": "#00aa08",
+            "placement": "#c5ab00",
             "wrong": "#2C2C2C",  
             "default": "#6a6a6a"
         }
