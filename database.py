@@ -1,3 +1,4 @@
+from datetime import datetime
 import sqlite3
 
 DB_NAME = "users.db"
@@ -20,7 +21,8 @@ def InitDB():
             wins INTEGER DEFAULT 0,
             streak INTEGER DEFAULT 0,
             total_games_played INTEGER DEFAULT 0,
-            time_finished TEXT
+            time_finished TEXT DEFAULT NULL,
+            last_played_date TEXT DEFAULT NULL
         )
     ''')
 
@@ -59,7 +61,7 @@ def getUserWins(username):
     cursor = conn.cursor()
     
     try:
-        cursor.execute("SELECT wins FROM users WHERE username = ?", (username))
+        cursor.execute("SELECT wins FROM users WHERE username = ?", (username,))
         result = cursor.fetchone()
         conn.close()
         
@@ -76,7 +78,7 @@ def getUserStreak(username):
     cursor = conn.cursor()
     
     try:
-        cursor.execute("SELECT streak FROM users WHERE username = ?", (username))
+        cursor.execute("SELECT streak FROM users WHERE username = ?", (username,))
         result = cursor.fetchone()
         conn.close()
         
@@ -93,7 +95,7 @@ def getTotalGamesPlayed(username):
     cursor = conn.cursor()
     
     try:
-        cursor.execute("SELECT total_games_played FROM users WHERE username = ?", (username))
+        cursor.execute("SELECT total_games_played FROM users WHERE username = ?", (username,))
         result = cursor.fetchone()
         conn.close()
         
@@ -103,26 +105,6 @@ def getTotalGamesPlayed(username):
             return 0
     except:
         return 0
-    
-
-
-def saveGameTime(username, minutes, seconds):
-    formatted_time = f"{minutes}:{seconds:02d}"
-    
-    conn = sqlite3.connect(DB_NAME)
-    cursor = conn.cursor()
-    
-    try:
-        cursor.execute(
-            "UPDATE users SET time_finished = ? WHERE username = ?", 
-            (formatted_time, username)
-        )
-        conn.commit()
-        return True
-    except Exception as e:
-        return False
-    finally:
-        conn.close()
 
 
 InitDB()
