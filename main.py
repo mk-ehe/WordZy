@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 import random
 
 from Entry import EntryScreen
-
+import database
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -127,7 +127,6 @@ class MainWindow(QMainWindow):
         
         self.last_words = self.getLastWords()
         self.last_seven_text = QLabel("Last 7 words")
-        self.last_seven_text.setStyleSheet("")
         self.last_seven_text.setStyleSheet("""
             color: white;
             border: none;
@@ -140,12 +139,39 @@ class MainWindow(QMainWindow):
 
         self.right_container = QWidget()
         self.right_container.setFixedSize(175, 280)
+        self.right_container.setContentsMargins(0, 0, 0, 0)
+        self.right_container.setStyleSheet("""
+            background-color: #282828;  
+            border: 1px solid #555555;  
+            border-radius: 10px;        
+            padding-top: 1px;
+            padding-bottom: 2px;
+            margin-right: 15px;             
+        """)
+        self.right_widget = QLabel("Stats")
         self.right_layout = QVBoxLayout(self.right_container)
-        self.right_widget = QLabel("Right panel")
-        self.right_widget.setStyleSheet("color: white; font-size: 20px;")
+        self.right_layout.setSpacing(6)
+        self.right_widget.setStyleSheet("color: white; font: bold 18px Arial; border: 0px")
         self.right_widget.setAlignment(Qt.AlignmentFlag.AlignHCenter)
-        self.right_widget.setContentsMargins(0, 0, 20, 0)
+        self.right_widget.setContentsMargins(0, 0, 0, 0)
         self.right_layout.addWidget(self.right_widget)
+
+        
+        self.wins = QLabel("")
+        self.wins.setStyleSheet("color: white; background-color: #808080; font: bold 18px Arial")
+        self.wins.setFixedSize(157, 40)
+        self.wins.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.right_layout.addWidget(self.wins)
+        
+
+        self.streak = QLabel("")
+        self.streak.setStyleSheet("color: white; background-color: #808080; font: bold 18px Arial")
+        self.streak.setFixedSize(157, 40)
+        self.streak.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.right_layout.addWidget(self.streak)
+
+
+        self.right_layout.addStretch()
 
 
         self.middle_layout.addStretch(1)
@@ -222,6 +248,11 @@ class MainWindow(QMainWindow):
         self.stack.setCurrentIndex(1)
         self.setFocus()
         self.username_label.setText(username)
+        self.username = username
+
+        self.wins.setText(f"Guessed: {database.getUserWins(username)}")
+        self.streak.setText(f"Streak: {database.getUserStreak(username)}")
+
 
 
     def loadValidWords(self):

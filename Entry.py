@@ -129,7 +129,6 @@ class EntryScreen(QWidget):
         user = self.username_input.text().strip()
         password = self.password_input.text().strip()
         
-
         if user and password:
             if len(user) > 30:
                 self.error_label.setText("Username too long, MAX:30")
@@ -139,6 +138,7 @@ class EntryScreen(QWidget):
                 self.error_label.setText("Password too short, MIN:6")
                 return
         else:
+            self.error_label.setText("Please enter your credentials.")
             return
 
         if database.register(user, password):
@@ -152,12 +152,17 @@ class EntryScreen(QWidget):
         user = self.username_input.text().strip()
         password = self.password_input.text().strip()
 
-        if database.login(user, password):
-            self.error_label.setText("")
-            self.login_successful.emit(user)
+        if user and password:
+
+            if database.login(user, password):
+                self.error_label.setText("")
+                self.login_successful.emit(user)
+            else:
+                self.error_label.setText("Wrong credentials.") 
+
         else:
-            self.error_label.setText("Wrong credentials.") 
-    
+            self.error_label.setText("Please enter your credentials.")
+            return
 
     def continueAsGuest(self):
         self.login_successful.emit("Guest")

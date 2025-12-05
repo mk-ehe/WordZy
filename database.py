@@ -17,7 +17,9 @@ def InitDB():
             word4 TEXT DEFAULT NULL,
             word5 TEXT DEFAULT NULL,
             word6 TEXT DEFAULT NULL,
-            wins INTEGER DEFAULT 0
+            wins INTEGER DEFAULT 0,
+            streak INTEGER DEFAULT 0,
+            time_finished TEXT
         )
     ''')
 
@@ -49,6 +51,59 @@ def login(username, password):
     conn.close()
     
     return result is not None
+
+
+def getUserWins(username):
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute("SELECT wins FROM users WHERE username = ?", (username))
+        result = cursor.fetchone()
+        conn.close()
+        
+        if result:
+            return result[0]
+        else:
+            return 0
+    except:
+        return 0
+    
+
+def getUserStreak(username):
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute("SELECT streak FROM users WHERE username = ?", (username))
+        result = cursor.fetchone()
+        conn.close()
+        
+        if result:
+            return result[0]
+        else:
+            return 0
+    except:
+        return 0
+
+
+def saveGameTime(username, minutes, seconds):
+    formatted_time = f"{minutes}:{seconds:02d}"
+    
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute(
+            "UPDATE users SET time_finished = ? WHERE username = ?", 
+            (formatted_time, username)
+        )
+        conn.commit()
+        return True
+    except Exception as e:
+        return False
+    finally:
+        conn.close()
 
 
 InitDB()
