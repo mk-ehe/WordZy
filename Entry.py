@@ -129,12 +129,16 @@ class EntryScreen(QWidget):
         user = self.username_input.text().strip()
         password = self.password_input.text().strip()
         
-        if len(user) > 30:
-            self.error_label.setText("Username too long, MAX:30")
-            return
-        
-        if len(password) < 5:
-            self.error_label.setText("Password too short, MIN:6")
+
+        if user and password:
+            if len(user) > 30:
+                self.error_label.setText("Username too long, MAX:30")
+                return
+            
+            if len(password) < 5:
+                self.error_label.setText("Password too short, MIN:6")
+                return
+        else:
             return
 
         if database.register(user, password):
