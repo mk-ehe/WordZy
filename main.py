@@ -243,6 +243,7 @@ class MainWindow(QMainWindow):
         self.setFocus()
         self.username_label.setText(username)
         self.username = username
+        
         self.time.setText("00:00")
         self.game_timer.start(1000)
 

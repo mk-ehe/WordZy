@@ -1,5 +1,6 @@
 from datetime import datetime
 import sqlite3
+import bcrypt
 
 DB_NAME = "users.db"
 
@@ -32,8 +33,16 @@ def InitDB():
 def register(username, password):
     connection = sqlite3.connect(DB_NAME)
     cursor = connection.cursor()
+
+    bytes = password.encode('utf-8')
+    
+    salt = bcrypt.gensalt()
+    hashed_password = bcrypt.hashpw(bytes, salt)
+
+    hashed_password_str = hashed_password.decode('utf-8')
+
     try:
-        cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, password))
+        cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, hashed_password_str))
 
         connection.commit()
         connection.close()
@@ -44,17 +53,28 @@ def register(username, password):
         return False
 
 
-def login(username, password):
+def login(username, password_input):
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
     
-    cursor.execute("SELECT username FROM users WHERE username = ? AND password = ?", (username, password))
+    cursor.execute("SELECT password FROM users WHERE username = ?", (username,))
     result = cursor.fetchone()
     
     conn.close()
     
-    return result is not None
+    if result:
+        stored_password_hash = result[0]
+        
+        input_bytes = password_input.encode('utf-8')
+        stored_bytes = stored_password_hash.encode('utf-8')
 
+        if bcrypt.checkpw(input_bytes, stored_bytes):
+            return True
+        else:
+            return False
+    else:
+        return False
+    
 
 def getUserWins(username):
     conn = sqlite3.connect(DB_NAME)
