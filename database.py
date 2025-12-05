@@ -19,6 +19,7 @@ def InitDB():
             word6 TEXT DEFAULT NULL,
             wins INTEGER DEFAULT 0,
             streak INTEGER DEFAULT 0,
+            total_games_played INTEGER DEFAULT 0,
             time_finished TEXT
         )
     ''')
@@ -85,6 +86,24 @@ def getUserStreak(username):
             return 0
     except:
         return 0
+    
+
+def getTotalGamesPlayed(username):
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute("SELECT total_games_played FROM users WHERE username = ?", (username))
+        result = cursor.fetchone()
+        conn.close()
+        
+        if result:
+            return result[0]
+        else:
+            return 0
+    except:
+        return 0
+    
 
 
 def saveGameTime(username, minutes, seconds):

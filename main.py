@@ -156,23 +156,6 @@ class MainWindow(QMainWindow):
         self.right_widget.setContentsMargins(0, 0, 0, 0)
         self.right_layout.addWidget(self.right_widget)
 
-        
-        self.wins = QLabel("")
-        self.wins.setStyleSheet("color: white; background-color: #808080; font: bold 18px Arial")
-        self.wins.setFixedSize(157, 40)
-        self.wins.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.right_layout.addWidget(self.wins)
-        
-
-        self.streak = QLabel("")
-        self.streak.setStyleSheet("color: white; background-color: #808080; font: bold 18px Arial")
-        self.streak.setFixedSize(157, 40)
-        self.streak.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.right_layout.addWidget(self.streak)
-
-
-        self.right_layout.addStretch()
-
 
         self.middle_layout.addStretch(1)
         self.middle_layout.addWidget(self.left_container)
@@ -222,7 +205,7 @@ class MainWindow(QMainWindow):
         self.keyboard_main_layout.setAlignment(Qt.AlignmentFlag.AlignHCenter)
         
 
-        self.info_label = QLabel("")
+        self.info_label = QLabel()
         self.info_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.info_label.setStyleSheet("""
             font: bold 18px Arial;
@@ -240,6 +223,7 @@ class MainWindow(QMainWindow):
         self.createKeyboard()
         self.addToTitleBar()
         self.createGrid()
+        self.createRightLayout()
 
         self.game_layout.addStretch()
 
@@ -250,9 +234,76 @@ class MainWindow(QMainWindow):
         self.username_label.setText(username)
         self.username = username
 
-        self.wins.setText(f"Guessed: {database.getUserWins(username)}")
-        self.streak.setText(f"Streak: {database.getUserStreak(username)}")
 
+    def createRightLayout(self):
+        self.wins = QLabel(f"Guessed: {database.getUserWins(self.username)}")
+        self.wins.setStyleSheet("""color: white;
+                                background-color: qlineargradient(
+                                x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #00ff00,
+                                stop:1 #006100); 
+                                font: bold 18px Arial;
+                                border: 2px solid #00ff00""")
+        self.wins.setFixedSize(157, 42)
+        self.wins.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.right_layout.addWidget(self.wins)
+
+
+        self.total_games = QLabel(f"Played: {database.getTotalGamesPlayed(self.username)}")
+        self.total_games.setStyleSheet("""color: white;
+                                    background-color: qlineargradient(
+                                    x1:0, y1:0, x2:0, y2:1,
+                                    stop:0 #d4d4d4,
+                                    stop:1 #3d3d3d); 
+                                    font: bold 18px Arial;
+                                    border: 2px solid #d4d4d4""")
+        self.total_games.setFixedSize(157, 42)
+        self.total_games.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.right_layout.addWidget(self.total_games)
+        
+
+        self.streak = QLabel(f"Streak: {database.getUserStreak(self.username)}")
+        self.streak.setStyleSheet("""color: white;
+                                background-color: qlineargradient(
+                                x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #ffbf00,
+                                stop:1 red); 
+                                font: bold 18px Arial;
+                                border: 2px solid #ffbf00""")
+        self.streak.setFixedSize(157, 42)
+        self.streak.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.right_layout.addWidget(self.streak)
+
+
+        percentage = round(database.getUserWins(self.username) / database.getTotalGamesPlayed(self.username) * 100, 2) \
+            if database.getTotalGamesPlayed(self.username) != 0 else "0.00"
+        self.percentage = QLabel(f"Win%: {percentage}")
+        self.percentage.setStyleSheet("""color: white;
+                                background-color: qlineargradient(
+                                x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #00b7ff,
+                                stop:1 #001cbd); 
+                                font: bold 18px Arial;
+                                border: 2px solid #00b7ff""")
+        self.percentage.setFixedSize(157, 42)
+        self.percentage.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.right_layout.addWidget(self.percentage)
+
+
+        self.time = QLabel()
+        self.time.setStyleSheet("""color: white;
+                            background-color: qlineargradient(
+                            x1:0, y1:0, x2:0, y2:1,
+                            stop:0 #ff0080,
+                            stop:1 #800000); 
+                            font: bold 18px Arial;
+                            border: 2px solid #ff0080""")
+        self.time.setFixedSize(157, 42)
+        self.time.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.right_layout.addWidget(self.time)
+
+
+        self.right_layout.addStretch()
 
 
     def loadValidWords(self):
