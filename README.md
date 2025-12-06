@@ -74,9 +74,8 @@ Ensure you have Python installed. You will need the following packages:
 2.  **Install dependencies**
     It is recommended to use a virtual environment.
     ```bash
-    pip install PySide6 requests bcrypt
+    pip install -r requirements.txt
     ```
-    *(Or if you created a requirements.txt file: `pip install -r requirements.txt`)*
 
 3.  **Run the Application**
     ```bash
