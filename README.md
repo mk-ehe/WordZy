@@ -67,7 +67,7 @@ Ensure you have Python installed. You will need the following packages:
 
 1.  **Clone the repository**
     ```bash
-    git clone [https://github.com/mk-ehe/WordZy.git](https://github.com/mk-ehe/WordZy.git)
+    git clone https://github.com/mk-ehe/WordZy.git
     cd WordZy
     ```
 

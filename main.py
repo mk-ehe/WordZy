@@ -271,6 +271,25 @@ class MainWindow(QMainWindow):
                 self.changeInfoLabelDaily("#00ff00")
                 self.game_finished = True
                 self.game_timer.stop()
+
+
+        saved_time = database.getTime(self.username)
+        
+        if saved_time:
+            try:
+                parts = saved_time.split(":")
+                self.minutes = int(parts[0])
+                self.seconds = int(parts[1])
+            except:
+                self.minutes = 0
+                self.seconds = 0
+                
+            formatted_time = f"{self.minutes:02}:{self.seconds:02}"
+            self.time.setText(formatted_time)
+        else:
+            self.time.setText("00:00")
+            self.minutes = 0
+            self.seconds = 0
             
         self.updateKeyboardColors()
         
@@ -294,6 +313,13 @@ class MainWindow(QMainWindow):
             self.seconds = 0
             self.minutes += 1
         self.time.setText(f"{self.minutes:02}:{self.seconds:02}")
+
+
+    def closeEvent(self, event):
+        if self.username and self.username != "Guest" and not self.game_finished:
+            current_time_str = self.time.text()
+            database.sendTime(self.username, current_time_str)
+        event.accept()
 
 
     def showGame(self, username):
