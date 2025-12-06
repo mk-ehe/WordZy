@@ -26,6 +26,7 @@ class MainWindow(QMainWindow):
         self.invalid_word = False
 
         self.username = ""
+        self.int_word = 1
 
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
@@ -180,7 +181,7 @@ class MainWindow(QMainWindow):
         self.username_logo = QLabel()
         self.pixmap = QPixmap("logo.png")
         self.username_logo.setPixmap(self.pixmap)
-        self.username_logo.setStyleSheet("padding-top: 6px; padding-right: 16px")
+        self.username_logo.setStyleSheet("padding-top: 5px; padding-right: 16px")
 
         self.username_label = QLabel(self.username)
         self.username_label.setStyleSheet("color: white; font: bold 20px Arial; padding-right: 56px; padding-top: 12px;")
@@ -227,6 +228,62 @@ class MainWindow(QMainWindow):
         self.game_layout.addStretch()
 
 
+    def restoreGame(self, words):
+        for row_idx, word in enumerate(words):
+            self.current_row = row_idx
+            self.current_col = 0
+            
+            start_idx = self.current_row * self.GRID_COLS
+            for i, letter in enumerate(word):
+                self.grid_labels[start_idx + i].setText(letter.upper())
+                self.grid_labels[start_idx + i].setProperty("state", "filled")
+            
+            available_letters = list(self.correct_word)
+
+            for i in range(5):
+                idx = start_idx + i
+                letter = word[i]
+                if letter == self.correct_word[i]:
+                    self.grid_labels[idx].setProperty("state", "correct")
+                    available_letters[i] = None
+                    self.keyboard_status[letter.upper()] = "correct"
+            
+            for i in range(5):
+                idx = start_idx + i
+                letter = word[i]
+                if self.grid_labels[idx].property("state") == "correct":
+                    continue
+                if letter in available_letters:
+                    self.grid_labels[idx].setProperty("state", "placement")
+                    available_letters[available_letters.index(letter)] = None
+                    if self.keyboard_status.get(letter.upper()) != "correct":
+                        self.keyboard_status[letter.upper()] = "placement"
+                else:
+                    self.grid_labels[idx].setProperty("state", "wrong")
+                    if self.keyboard_status.get(letter.upper()) not in ["correct", "placement"]:
+                        self.keyboard_status[letter.upper()] = "wrong"
+
+            for i in range(5):
+                self.grid_labels[start_idx + i].style().polish(self.grid_labels[start_idx + i])
+            
+            if word == self.correct_word:
+                self.changeInfoLabelDaily("#00ff00")
+                self.game_finished = True
+                self.game_timer.stop()
+            
+        self.updateKeyboardColors()
+        
+        if not self.game_finished:
+            self.current_row = len(words)
+            self.int_word = len(words) + 1
+            if self.current_row >= 6:
+                self.changeInfoLabelDaily("white")
+                self.game_finished = True
+                self.game_timer.stop()
+            else:
+                self.setActiveCell()
+
+
     def updateTimer(self):
         if self.game_finished:
             self.game_timer.stop()
@@ -244,8 +301,29 @@ class MainWindow(QMainWindow):
         self.username_label.setText(username)
         self.username = username
         
-        self.time.setText("00:00")
-        self.game_timer.start(1000)
+
+        time = database.getTime(self.username)
+        if time:
+            self.time.setText(time)
+        else:
+            self.time.setText("00:00")
+
+        database.checkAndResetDaily(username)
+        
+        played_words = database.getPlayedWords(username)
+        
+        if played_words:
+            self.restoreGame(played_words)
+            if not self.game_finished:
+                self.game_timer.start(1000)
+        else:
+            self.game_timer.start(1000)
+
+        self.wins.setText("Won: "+str(database.getUserWins(self.username)))
+        self.total_games.setText("Played: "+str(database.getTotalGamesPlayed(self.username)))
+        self.streak.setText("Streak: "+str(database.getUserStreak(self.username)))
+        if database.getTotalGamesPlayed(self.username) != 0:
+            self.percentage.setText("Win: "+str(database.getUserWins(self.username) / database.getTotalGamesPlayed(self.username) * 100)+"%")
 
 
     def loadValidWords(self):
@@ -392,7 +470,7 @@ class MainWindow(QMainWindow):
         self.right_layout.addWidget(self.right_widget)
 
 
-        self.wins = QLabel(f"Guessed: {database.getUserWins(self.username)}")
+        self.wins = QLabel(f"Won: {database.getUserWins(self.username)}")
         self.wins.setStyleSheet("""color: white;
                                 background-color: qlineargradient(
                                 x1:0, y1:0, x2:0, y2:1,
@@ -433,7 +511,7 @@ class MainWindow(QMainWindow):
 
         percentage = round(database.getUserWins(self.username) / database.getTotalGamesPlayed(self.username) * 100, 2) \
             if database.getTotalGamesPlayed(self.username) != 0 else "0.00"
-        self.percentage = QLabel(f"Win%: {percentage}")
+        self.percentage = QLabel(f"Win: {percentage}")
         self.percentage.setStyleSheet("""color: white;
                                 background-color: qlineargradient(
                                 x1:0, y1:0, x2:0, y2:1,
@@ -647,12 +725,40 @@ class MainWindow(QMainWindow):
         for i in range(start_idx, end_idx):
             self.grid_labels[i].style().polish(self.grid_labels[i])
             
+
         if word_entered == self.correct_word:
             self.changeInfoLabelDaily("#00ff00")
             self.game_finished = True
+
+            database.sendTime(self.username, self.time.text())
+
+            database.updateWins(self.username)
+            self.wins.setText("Won: "+str(database.getUserWins(self.username)))
+
+            database.updateTotalGames(self.username)
+            self.total_games.setText("Played: "+str(database.getTotalGamesPlayed(self.username)))
+
+            database.updateUserStreak(self.username)
+            self.streak.setText("Streak: "+str(database.getUserStreak(self.username)))
+
+
         elif self.grid_labels[-1].text() != "":
             self.changeInfoLabelDaily("white")
             self.game_finished = True
+            database.sendTime(self.username, self.time.text())
+
+            database.updateTotalGames(self.username)
+            self.total_games.setText("Played: "+str(database.getTotalGamesPlayed(self.username)))
+
+            database.setStreakToZero(self.username)
+
+
+        if self.username != "Guest":
+            database.sendWord(self.username, self.int_word, word_entered)
+            self.int_word += 1   
+
+        if self.game_finished:
+            self.percentage.setText("Win: "+str(database.getUserWins(self.username) / database.getTotalGamesPlayed(self.username) * 100)+"%")
 
 
     def changeInfoLabelInvalid(self):
