@@ -210,6 +210,21 @@ def sendWord(username, word_int, word):
         conn.close()
 
 
+def sendTime(username, time):
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+
+    sql_query = f"UPDATE users SET time_finished = ? WHERE username = ?"
+
+    try:
+        cursor.execute(sql_query, (time, username))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(e)
+    finally:
+        conn.close()
+
+
 def checkAndResetDaily(username):
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
