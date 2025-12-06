@@ -1,13 +1,25 @@
 from PySide6.QtWidgets import QMainWindow, QApplication, QLabel, QHBoxLayout, QPushButton, QWidget, QVBoxLayout, QGridLayout, QStackedWidget
 from PySide6.QtCore import Qt, QPoint, QTimer
 from PySide6.QtGui import QMouseEvent, QKeyEvent, QPixmap, QIcon
-import sys
+
 import requests
 from datetime import datetime, timedelta
 import random
+import sys
+import os
 
-from Entry import EntryScreen
 import database
+from Entry import EntryScreen
+
+
+def resourcePath(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -18,7 +30,7 @@ class MainWindow(QMainWindow):
 
         self._drag_position = QPoint()
         self._dragging = False
-        self.setWindowIcon(QIcon("logo.png"))
+        self.setWindowIcon(QIcon(resourcePath("logo.png")))
 
         self.invalid_timer = QTimer()
         self.invalid_timer.setSingleShot(True)
@@ -180,7 +192,7 @@ class MainWindow(QMainWindow):
 
 
         self.username_logo = QLabel()
-        self.pixmap = QPixmap("logo.png")
+        self.pixmap = QPixmap(resourcePath("logo.png"))
         self.username_logo.setPixmap(self.pixmap)
         self.username_logo.setStyleSheet("padding-top: 5px; padding-right: 16px")
 
