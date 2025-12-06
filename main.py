@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QMainWindow, QApplication, QLabel, QHBoxLayout, QPushButton, QWidget, QVBoxLayout, QGridLayout, QStackedWidget
 from PySide6.QtCore import Qt, QPoint, QTimer
-from PySide6.QtGui import QMouseEvent, QKeyEvent, QPixmap
+from PySide6.QtGui import QMouseEvent, QKeyEvent, QPixmap, QIcon
 import sys
 import requests
 from datetime import datetime, timedelta
@@ -18,6 +18,7 @@ class MainWindow(QMainWindow):
 
         self._drag_position = QPoint()
         self._dragging = False
+        self.setWindowIcon(QIcon("logo.png"))
 
         self.invalid_timer = QTimer()
         self.invalid_timer.setSingleShot(True)
@@ -757,9 +758,9 @@ class MainWindow(QMainWindow):
             database.sendWord(self.username, self.int_word, word_entered)
             self.int_word += 1   
 
-        if self.game_finished:
-            self.percentage.setText("Win: "+str(database.getUserWins(self.username) / database.getTotalGamesPlayed(self.username) * 100)+"%")
-
+        if self.game_finished and database.getTotalGamesPlayed(self.username) != 0:
+            self.percentage.setText("Win: "+str(round(database.getUserWins(self.username) / database.getTotalGamesPlayed(self.username) * 100, 2))+"%")
+            
 
     def changeInfoLabelInvalid(self):
         self.info_label.setStyleSheet("font: bold 18px Arial; color: red; padding-top: 10px")
