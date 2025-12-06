@@ -74,20 +74,38 @@ def login(username, password_input):
             return False
     else:
         return False
+    
 
-
-def updateWins(username):
+def finalizeGame(username, won, time_str):
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
-
-    wins = getUserWins(username) + 1
-    sql_query = f"UPDATE users SET wins = ? WHERE username = ?"
-
+    
     try:
-        cursor.execute(sql_query, (wins, username))
-        conn.commit()
+        cursor.execute("SELECT wins, streak, total_games_played FROM users WHERE username = ?", (username,))
+        row = cursor.fetchone()
+        
+        if row:
+            curr_wins, curr_streak, curr_total = row
+            
+            new_total = curr_total + 1
+            new_wins = curr_wins + 1 if won else curr_wins
+            
+            if won:
+                new_streak = curr_streak + 1
+            else:
+                new_streak = 0
+
+            cursor.execute("""
+                UPDATE users 
+                SET wins=?, streak=?, total_games_played=?, time_finished=? 
+                WHERE username=?
+            """, (new_wins, new_streak, new_total, time_str, username))
+
+            conn.commit()
+            return True
     except Exception as e:
         print(e)
+        return False
     finally:
         conn.close()
 
@@ -106,23 +124,7 @@ def getUserWins(username):
         else:
             return 0
     except:
-        return 0
-    
-
-def updateTotalGames(username):
-    conn = sqlite3.connect(DB_NAME)
-    cursor = conn.cursor()
-
-    games = getTotalGamesPlayed(username) + 1
-    sql_query = f"UPDATE users SET total_games_played = ? WHERE username = ?"
-
-    try:
-        cursor.execute(sql_query, (games, username))
-        conn.commit()
-    except Exception as e:
-        print(e)
-    finally:
-        conn.close()   
+        return 0  
 
 
 def getTotalGamesPlayed(username):
@@ -157,22 +159,6 @@ def setStreakToZero(username):
         conn.close() 
 
 
-def updateUserStreak(username):
-    conn = sqlite3.connect(DB_NAME)
-    cursor = conn.cursor()
-
-    streak = getUserStreak(username) + 1
-    sql_query = f"UPDATE users SET streak = ? WHERE username = ?"
-
-    try:
-        cursor.execute(sql_query, (streak, username))
-        conn.commit()
-    except Exception as e:
-        print(e)
-    finally:
-        conn.close() 
-
-
 def getUserStreak(username):
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
@@ -188,21 +174,6 @@ def getUserStreak(username):
             return 0
     except:
         return 0
-
-
-def sendTime(username, time):
-    conn = sqlite3.connect(DB_NAME)
-    cursor = conn.cursor()
-
-    sql_query = f"UPDATE users SET time_finished = ? WHERE username = ?"
-
-    try:
-        cursor.execute(sql_query, (time, username))
-        conn.commit()
-    except sqlite3.Error as e:
-        print(e)
-    finally:
-        conn.close()
 
 
 def getTime(username):

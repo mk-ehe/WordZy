@@ -753,39 +753,56 @@ class MainWindow(QMainWindow):
             self.grid_labels[i].style().polish(self.grid_labels[i])
             
 
-        if word_entered == self.correct_word:
+        is_win = (word_entered == self.correct_word)
+        is_loss = (self.grid_labels[-1].text() != "" and not is_win)
+
+        if is_win:
             self.changeInfoLabelDaily("#00ff00")
             self.game_finished = True
 
-            database.sendTime(self.username, self.time.text())
+            if self.username != "Guest":
+                self.runInBackground(database.finalizeGame, self.username, True, self.time.text())
+                self.updateStatsDisplay(win=True)
 
-            database.updateWins(self.username)
-            self.wins.setText("Won: "+str(database.getUserWins(self.username)))
-
-            database.updateTotalGames(self.username)
-            self.total_games.setText("Played: "+str(database.getTotalGamesPlayed(self.username)))
-
-            database.updateUserStreak(self.username)
-            self.streak.setText("Streak: "+str(database.getUserStreak(self.username)))
-
-
-        elif self.grid_labels[-1].text() != "":
+        elif is_loss:
             self.changeInfoLabelDaily("white")
             self.game_finished = True
-            database.sendTime(self.username, self.time.text())
 
-            database.updateTotalGames(self.username)
-            self.total_games.setText("Played: "+str(database.getTotalGamesPlayed(self.username)))
-
-            database.setStreakToZero(self.username)
-
+            if self.username != "Guest":
+                self.runInBackground(database.finalizeGame, self.username, False, self.time.text())
+                self.updateStatsDisplay(win=False)
 
         if self.username != "Guest":
-            database.sendWord(self.username, self.int_word, word_entered)
-            self.int_word += 1   
+            self.runInBackground(database.sendWord, self.username, self.int_word, word_entered)
+            self.int_word += 1
 
-        if self.game_finished and database.getTotalGamesPlayed(self.username) != 0:
-            self.percentage.setText("Win: "+str(round(database.getUserWins(self.username) / database.getTotalGamesPlayed(self.username) * 100, 2))+"%")
+
+    def runInBackground(self, func, *args):
+        import threading
+        thread = threading.Thread(target=func, args=args)
+        thread.daemon = True
+        thread.start()
+
+
+    def updateStatsDisplay(self, win):
+        try:
+            curr_wins = int(self.wins.text().split(": ")[1])
+            curr_played = int(self.total_games.text().split(": ")[1])
+            curr_streak = int(self.streak.text().split(": ")[1])
+        except:
+            return
+
+        new_played = curr_played + 1
+        new_wins = curr_wins + 1 if win else curr_wins
+        new_streak = curr_streak + 1 if win else 0
+
+        self.wins.setText(f"Won: {new_wins}")
+        self.total_games.setText(f"Played: {new_played}")
+        self.streak.setText(f"Streak: {new_streak}")
+
+        if new_played > 0:
+            pct = round((new_wins / new_played) * 100, 2)
+            self.percentage.setText(f"Win: {pct}%")
             
 
     def changeInfoLabelInvalid(self):
