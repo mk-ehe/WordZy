@@ -87,11 +87,12 @@ Ensure you have Python installed. You will need the following packages:
 
 ```text
 WordZy/
-├── main.py           # Main entry point and Game Logic
-├── database.py       # Database handling
-├── Entry.py          # Login UI
-├── requirements.txt  # List of dependencies
-├── logo.png          # Assets
-├── start_screen.png  # Assets
-├── game_screen.png   # Assets
-└── README.md         # Documentation
+├── main.py           
+├── database.py
+├── LICENSE            
+├── Entry.py          
+├── requirements.txt  
+├── logo.png          
+├── start_screen.png  
+├── game_screen.png   
+└── README.md         
