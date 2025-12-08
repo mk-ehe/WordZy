@@ -74,7 +74,6 @@ class MainWindow(QMainWindow):
 
         self.valid_words = self.loadValidWords()
         self.extra_words = self.loadExtraWords()
-        self.correct_word = self.getDailyWord()
         self.game_finished = False
         
 
@@ -335,6 +334,10 @@ class MainWindow(QMainWindow):
 
 
     def showGame(self, username):
+        database.checkAndResetDaily(username)
+        
+        self.correct_word = self.getDailyWord()
+
         self.stack.setCurrentIndex(1)
         self.setFocus()
         self.username_label.setText(username)
@@ -347,8 +350,6 @@ class MainWindow(QMainWindow):
         else:
             self.time.setText("00:00")
 
-        database.checkAndResetDaily(username)
-        
         played_words = database.getPlayedWords(username)
         
         if played_words:
