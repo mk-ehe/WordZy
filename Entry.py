@@ -63,6 +63,7 @@ class EntryScreen(QWidget):
         self.horizontal_buttons.setContentsMargins(0, 4, 0, 0)
 
         self.register_btn = QPushButton("REGISTER")
+        self.register_btn.setFocusPolicy(Qt.NoFocus)
         self.register_btn.setFixedWidth(130)
         self.register_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.register_btn.setStyleSheet("""
@@ -81,6 +82,7 @@ class EntryScreen(QWidget):
         
 
         self.login_btn = QPushButton("LOGIN")
+        self.login_btn.setFocusPolicy(Qt.NoFocus)
         self.login_btn.setFixedWidth(130)
         self.login_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.login_btn.setStyleSheet("""
@@ -101,6 +103,7 @@ class EntryScreen(QWidget):
 
 
         self.guest_btn = QPushButton("GUEST")
+        self.guest_btn.setFocusPolicy(Qt.NoFocus)
         self.guest_btn.setFixedWidth(150)
         self.guest_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.guest_btn.setStyleSheet("""

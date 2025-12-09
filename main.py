@@ -3,6 +3,8 @@ from PySide6.QtCore import Qt, QPoint, QTimer
 from PySide6.QtGui import QMouseEvent, QKeyEvent, QPixmap, QIcon
 
 import requests
+import ntplib
+from time import ctime
 from datetime import datetime, timedelta
 import random
 import sys
@@ -414,6 +416,7 @@ class MainWindow(QMainWindow):
                                      padding-bottom: 2px""")
         
         close_button = QPushButton("✖", self)
+        close_button.setFocusPolicy(Qt.NoFocus)
         close_button.setStyleSheet("""QPushButton{ color: white;
                                      border: 0px;
                                      font-size: 14px;
@@ -424,6 +427,7 @@ class MainWindow(QMainWindow):
                                         }
                                     """)
         minimize_button = QPushButton("—", self)
+        minimize_button.setFocusPolicy(Qt.NoFocus)
         minimize_button.setStyleSheet("""QPushButton{ color: white;
                                      border: 0px;
                                      font-size: 12px;
@@ -589,6 +593,7 @@ class MainWindow(QMainWindow):
 
             for text in rows:
                 button = QPushButton(text)
+                button.setFocusPolicy(Qt.NoFocus)
                 button.clicked.connect(lambda _, t=text: self.handleButtonClick(t))
                 font_size = "20px"
                 padding_bottom = "4px"
