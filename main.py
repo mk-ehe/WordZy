@@ -3,8 +3,6 @@ from PySide6.QtCore import Qt, QPoint, QTimer
 from PySide6.QtGui import QMouseEvent, QKeyEvent, QPixmap, QIcon
 
 import requests
-import ntplib
-from time import ctime
 from datetime import datetime, timedelta
 import random
 import sys
