@@ -355,7 +355,7 @@ class MainWindow(QMainWindow):
 
 
     def closeEvent(self, event):
-        if self.username and self.username != "Guest" and not self.game_finished:
+        if self.username and self.username != "" and not self.game_finished:
             current_time_str = self.time.text()
             database.sendTime(self.username, current_time_str)
         event.accept()
@@ -364,7 +364,7 @@ class MainWindow(QMainWindow):
     def logout(self):
         self.game_timer.stop()
         
-        if self.username and self.username != "Guest" and not self.game_finished:
+        if self.username and self.username != "" and not self.game_finished:
             current_time_str = self.time.text()
             database.sendTime(self.username, current_time_str)
 
@@ -849,7 +849,7 @@ class MainWindow(QMainWindow):
             self.changeInfoLabelDaily("#00ff00")
             self.game_finished = True
 
-            if self.username != "Guest":
+            if self.username != "":
                 self.runInBackground(database.finalizeGame, self.username, True, self.time.text())
                 self.updateStatsDisplay(win=True)
 
@@ -857,11 +857,11 @@ class MainWindow(QMainWindow):
             self.changeInfoLabelDaily("white")
             self.game_finished = True
 
-            if self.username != "Guest":
+            if self.username != "":
                 self.runInBackground(database.finalizeGame, self.username, False, self.time.text())
                 self.updateStatsDisplay(win=False)
 
-        if self.username != "Guest":
+        if self.username != "":
             self.runInBackground(database.sendWord, self.username, self.int_word, word_entered)
             self.int_word += 1
 

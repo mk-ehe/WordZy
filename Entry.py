@@ -168,4 +168,4 @@ class EntryScreen(QWidget):
             return
 
     def continueAsGuest(self):
-        self.login_successful.emit("Guest")
+        self.login_successful.emit("")
