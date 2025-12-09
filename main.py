@@ -179,7 +179,9 @@ class MainWindow(QMainWindow):
 
         self.wordzy_container = QWidget()
         self.wordzy_layout = QGridLayout(self.wordzy_container)
-        self.wordzy_layout.setContentsMargins(0, 10, 0, 0)
+        self.wordzy_layout.setContentsMargins(0, 14, 14, 0)
+
+
         self.wordzy_label = QLabel("WordZy")
         self.wordzy_label.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop)
         self.wordzy_label.setStyleSheet("""
@@ -190,17 +192,43 @@ class MainWindow(QMainWindow):
         self.wordzy_layout.addWidget(self.wordzy_label, 0, 0, Qt.AlignmentFlag.AlignCenter)
 
 
+        self.user_info_widget = QWidget()
+        self.user_info_layout = QHBoxLayout(self.user_info_widget)
+        self.user_info_layout.setContentsMargins(0, 0, 0, 0)
+        self.user_info_layout.setAlignment(Qt.AlignmentFlag.AlignRight)
+
+        self.username_label = QLabel(self.username)
+        self.username_label.setStyleSheet("color: white; font: bold 20px Arial; padding-top: 5px;")
+        self.user_info_layout.addWidget(self.username_label)
+
         self.username_logo = QLabel()
         self.pixmap = QPixmap(resourcePath("logo.png"))
         self.username_logo.setPixmap(self.pixmap)
-        self.username_logo.setStyleSheet("padding-top: 5px; padding-right: 16px")
+        self.user_info_layout.addWidget(self.username_logo)
 
-        self.username_label = QLabel(self.username)
-        self.username_label.setStyleSheet("color: white; font: bold 20px Arial; padding-right: 56px; padding-top: 12px;")
-        self.wordzy_layout.addWidget(self.username_label, 0, 0, Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop)
+        self.logout_button = QPushButton("Logout")
+        self.logout_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.logout_button.setFocusPolicy(Qt.NoFocus)
+        self.logout_button.setFixedSize(80, 30)
+        self.logout_button.setStyleSheet("""
+            QPushButton {
+                background-color: #d90000;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                font-weight: bold;
+                font-size: 14px;
+                margin-left: 6px;
+                padding-bottom: 2px;
+                padding-right: 1px;
+            }
+            QPushButton:hover { background-color: red; }
+            QPushButton:pressed { background-color: #b30000; }
+        """)
+        self.logout_button.clicked.connect(self.logout)
+        self.user_info_layout.addWidget(self.logout_button)
 
-        self.username_logo.raise_()
-        self.wordzy_layout.addWidget(self.username_logo, 0, 0, Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop)
+        self.wordzy_layout.addWidget(self.user_info_widget, 0, 0, Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop)
 
 
         self.keyboard_rows = [["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
@@ -333,6 +361,48 @@ class MainWindow(QMainWindow):
         event.accept()
 
 
+    def logout(self):
+        self.game_timer.stop()
+        
+        if self.username and self.username != "Guest" and not self.game_finished:
+            current_time_str = self.time.text()
+            database.sendTime(self.username, current_time_str)
+
+        self.username = ""
+        self.int_word = 1
+        
+        self.minutes = 0
+        self.seconds = 0
+        self.time.setText("00:00")
+        
+        self.current_row = 0
+        self.current_col = 0
+        self.game_finished = False
+        self.invalid_word = False
+
+        self.keyboard_status = {l: "default" for l in self.keyboard_letters}
+        self.updateKeyboardColors()
+
+        for label in self.grid_labels:
+            label.setText("")         
+            label.setProperty("state", "empty")
+            label.style().unpolish(label)      
+            label.style().polish(label)      
+
+        self.info_label.setText("")
+        self.wins.setText("Won: 0")
+        self.total_games.setText("Played: 0")
+        self.streak.setText("Streak: 0")
+        self.percentage.setText("Win: 0.0%")
+
+        self.stack.setCurrentIndex(0)
+
+        self.login_screen.username_input.clear()
+        self.login_screen.username_input.setFocus()
+        self.login_screen.password_input.clear()
+        self.login_screen.error_label.setText("")
+
+
     def showGame(self, username):
         database.checkAndResetDaily(username)
         
@@ -358,6 +428,9 @@ class MainWindow(QMainWindow):
                 self.game_timer.start(1000)
         else:
             self.game_timer.start(1000)
+            self.current_row = 0
+            self.current_col = 0
+            self.setActiveCell()
 
         self.wins.setText("Won: "+str(database.getUserWins(self.username)))
         self.total_games.setText("Played: "+str(database.getTotalGamesPlayed(self.username)))
