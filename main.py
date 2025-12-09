@@ -179,7 +179,7 @@ class MainWindow(QMainWindow):
 
         self.wordzy_container = QWidget()
         self.wordzy_layout = QGridLayout(self.wordzy_container)
-        self.wordzy_layout.setContentsMargins(0, 14, 14, 0)
+        self.wordzy_layout.setContentsMargins(0, 10, 14, 0)
 
 
         self.wordzy_label = QLabel("WordZy")
@@ -217,6 +217,7 @@ class MainWindow(QMainWindow):
                 border-radius: 5px;
                 font-weight: bold;
                 font-size: 14px;
+                margin-top: 4px;
                 margin-left: 6px;
                 padding-bottom: 2px;
                 padding-right: 1px;
