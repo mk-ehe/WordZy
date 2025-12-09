@@ -191,13 +191,12 @@ class MainWindow(QMainWindow):
         """)
         self.wordzy_layout.addWidget(self.wordzy_label, 0, 0, Qt.AlignmentFlag.AlignCenter)
 
-
         self.user_info_widget = QWidget()
         self.user_info_layout = QHBoxLayout(self.user_info_widget)
         self.user_info_layout.setContentsMargins(0, 0, 0, 0)
         self.user_info_layout.setAlignment(Qt.AlignmentFlag.AlignRight)
 
-        self.username_label = QLabel(self.username)
+        self.username_label = QLabel()
         self.username_label.setStyleSheet("color: white; font: bold 20px Arial; padding-top: 5px;")
         self.user_info_layout.addWidget(self.username_label)
 
@@ -206,7 +205,7 @@ class MainWindow(QMainWindow):
         self.username_logo.setPixmap(self.pixmap)
         self.user_info_layout.addWidget(self.username_logo)
 
-        self.logout_button = QPushButton("Logout")
+        self.logout_button = QPushButton()
         self.logout_button.setCursor(Qt.CursorShape.PointingHandCursor)
         self.logout_button.setFocusPolicy(Qt.NoFocus)
         self.logout_button.setFixedSize(80, 30)
@@ -404,15 +403,19 @@ class MainWindow(QMainWindow):
 
 
     def showGame(self, username):
+        self.username = username
+        if username == "":
+            self.username_label.setText("Register to track your stats!")
+            self.logout_button.setText("Return")
+        else:
+            self.username_label.setText(username)
+            self.logout_button.setText("Logout")
+
         database.checkAndResetDaily(username)
         
         self.correct_word = self.getDailyWord()
 
         self.stack.setCurrentIndex(1)
-        self.setFocus()
-        self.username_label.setText(username)
-        self.username = username
-        
 
         time = database.getTime(self.username)
         if time:
