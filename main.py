@@ -4,6 +4,7 @@ from PySide6.QtGui import QMouseEvent, QKeyEvent, QPixmap, QIcon
 
 import requests
 from datetime import datetime, timedelta
+import ctypes
 import random
 import sys
 import os
@@ -1016,7 +1017,6 @@ class MainWindow(QMainWindow):
             event.accept()
 
 
-import ctypes
 if __name__ == "__main__":
     if sys.platform == 'win32':
         myappid = 'WordZy'
