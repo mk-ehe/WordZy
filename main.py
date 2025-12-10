@@ -179,7 +179,7 @@ class MainWindow(QMainWindow):
 
         self.wordzy_container = QWidget()
         self.wordzy_layout = QGridLayout(self.wordzy_container)
-        self.wordzy_layout.setContentsMargins(0, 10, 14, 0)
+        self.wordzy_layout.setContentsMargins(0, 10, 0, 0)
 
 
         self.wordzy_label = QLabel("WordZy")
@@ -193,7 +193,7 @@ class MainWindow(QMainWindow):
 
         self.user_info_widget = QWidget()
         self.user_info_layout = QHBoxLayout(self.user_info_widget)
-        self.user_info_layout.setContentsMargins(0, 0, 0, 0)
+        self.user_info_layout.setContentsMargins(0, 0, 14, 0)
         self.user_info_layout.setAlignment(Qt.AlignmentFlag.AlignRight)
 
         self.username_label = QLabel()
@@ -405,14 +405,15 @@ class MainWindow(QMainWindow):
 
     def showGame(self, username):
         self.username = username
-        if username == "":
+
+        if self.username == "":
             self.username_label.setText("Register to track your stats!")
             self.logout_button.setText("Return")
         else:
-            self.username_label.setText(username)
+            self.username_label.setText(self.username)
             self.logout_button.setText("Logout")
 
-        database.checkAndResetDaily(username)
+        database.checkAndResetDaily(self.username)
         
         self.correct_word = self.getDailyWord()
 
@@ -424,7 +425,7 @@ class MainWindow(QMainWindow):
         else:
             self.time.setText("00:00")
 
-        played_words = database.getPlayedWords(username)
+        played_words = database.getPlayedWords(self.username)
         
         if played_words:
             self.restoreGame(played_words)
