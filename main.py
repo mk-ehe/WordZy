@@ -10,6 +10,7 @@ import os
 
 import database
 from Entry import EntryScreen
+import ctypes
 
 
 def resourcePath(relative_path):
@@ -30,7 +31,6 @@ class MainWindow(QMainWindow):
 
         self._drag_position = QPoint()
         self._dragging = False
-        self.setWindowIcon(QIcon(resourcePath("logo.png")))
 
         self.invalid_timer = QTimer()
         self.invalid_timer.setSingleShot(True)
@@ -218,7 +218,7 @@ class MainWindow(QMainWindow):
                 font-weight: bold;
                 font-size: 14px;
                 margin-top: 4px;
-                margin-left: 6px;
+                margin-left: 7px;
                 padding-bottom: 2px;
                 padding-right: 1px;
             }
@@ -1016,8 +1016,18 @@ class MainWindow(QMainWindow):
             event.accept()
 
 
+import ctypes
 if __name__ == "__main__":
+    if sys.platform == 'win32':
+        myappid = 'WordZy'
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+
     app = QApplication(sys.argv)
+    
+    icon_path = resourcePath("logo.png")
+    app_icon = QIcon(icon_path)
+    app.setWindowIcon(app_icon)
+
     window = MainWindow()
     window.show()
     app.exec()
