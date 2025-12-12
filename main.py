@@ -412,7 +412,7 @@ class MainWindow(QMainWindow):
         self.total_games.setText("Played: "+str(database.getTotalGamesPlayed(self.username)))
         self.streak.setText("Streak: "+str(database.getUserStreak(self.username)))
         if database.getTotalGamesPlayed(self.username) != 0:
-            self.percentage.setText("Win: "+str(database.getUserWins(self.username) / database.getTotalGamesPlayed(self.username) * 100)+"%")
+            self.percentage.setText("Win: "+str(round(database.getUserWins(self.username) / database.getTotalGamesPlayed(self.username) * 100, 2))+"%")
 
 
     def loadValidWords(self):
