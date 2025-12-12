@@ -482,12 +482,9 @@ class MainWindow(QMainWindow):
     def wordzyLayout(self):
         self.github = QPushButton()
         self.github.setCursor(Qt.CursorShape.PointingHandCursor)
-
         self.pixmap_git = QPixmap(resourcePath("github_logo.png"))
-        
         self.github.setIcon(QIcon(self.pixmap_git))
         self.github.setFocusPolicy(Qt.NoFocus)
-        
         self.github.setIconSize(self.pixmap_git.size())
 
         self.github.setStyleSheet("""
@@ -496,14 +493,8 @@ class MainWindow(QMainWindow):
                 border-radius: 5px;
                 margin-left: 10px;
             }
-            QPushButton:hover {
-                background-color: #5c5c5c;
-                border-radius: 5px;
-            }
-            QPushButton:pressed {
-                background-color: #6a6a6a;
-                border-radius: 5px;
-            }
+            QPushButton:hover { background-color: #5c5c5c; }
+            QPushButton:pressed { background-color: #6a6a6a; }
         """)
         self.github.setToolTip("https://github.com/mk-ehe/WordZy")
         self.github.clicked.connect(self.redirectGithub)
