@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QMainWindow, QApplication, QLabel, QHBoxLayout, QPushButton, QWidget, QVBoxLayout, QGridLayout, QStackedWidget
-from PySide6.QtCore import Qt, QPoint, QTimer
-from PySide6.QtGui import QMouseEvent, QKeyEvent, QPixmap, QIcon
+from PySide6.QtCore import Qt, QPoint, QTimer, QUrl
+from PySide6.QtGui import QMouseEvent, QKeyEvent, QPixmap, QIcon, QDesktopServices
 
 import requests
 from datetime import datetime, timedelta
@@ -178,58 +178,10 @@ class MainWindow(QMainWindow):
         self.middle_layout.addWidget(self.right_container)
         self.middle_layout.addStretch(1)
 
+
         self.wordzy_container = QWidget()
         self.wordzy_layout = QGridLayout(self.wordzy_container)
         self.wordzy_layout.setContentsMargins(0, 10, 0, 0)
-
-
-        self.wordzy_label = QLabel("WordZy")
-        self.wordzy_label.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop)
-        self.wordzy_label.setStyleSheet("""
-            font-size: 46px;
-            font-weight: bold;
-            color: white;
-        """)
-        self.wordzy_layout.addWidget(self.wordzy_label, 0, 0, Qt.AlignmentFlag.AlignCenter)
-
-        self.user_info_widget = QWidget()
-        self.user_info_layout = QHBoxLayout(self.user_info_widget)
-        self.user_info_layout.setContentsMargins(0, 0, 14, 0)
-        self.user_info_layout.setAlignment(Qt.AlignmentFlag.AlignRight)
-
-        self.username_label = QLabel()
-        self.username_label.setStyleSheet("color: white; font: bold 20px Arial; padding-top: 5px;")
-        self.user_info_layout.addWidget(self.username_label)
-
-        self.username_logo = QLabel()
-        self.pixmap = QPixmap(resourcePath("logo.png"))
-        self.username_logo.setPixmap(self.pixmap)
-        self.user_info_layout.addWidget(self.username_logo)
-
-        self.logout_button = QPushButton()
-        self.logout_button.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.logout_button.setFocusPolicy(Qt.NoFocus)
-        self.logout_button.setFixedSize(80, 30)
-        self.logout_button.setStyleSheet("""
-            QPushButton {
-                background-color: #d90000;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                font-weight: bold;
-                font-size: 14px;
-                margin-top: 4px;
-                margin-left: 7px;
-                padding-bottom: 2px;
-                padding-right: 1px;
-            }
-            QPushButton:hover { background-color: red; }
-            QPushButton:pressed { background-color: #b30000; }
-        """)
-        self.logout_button.clicked.connect(self.logout)
-        self.user_info_layout.addWidget(self.logout_button)
-
-        self.wordzy_layout.addWidget(self.user_info_widget, 0, 0, Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop)
 
 
         self.keyboard_rows = [["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
@@ -265,6 +217,7 @@ class MainWindow(QMainWindow):
         self.addToTitleBar()
         self.createGrid()
         self.createRightLayout()
+        self.wordzyLayout()
 
         self.game_layout.addStretch()
 
@@ -524,6 +477,94 @@ class MainWindow(QMainWindow):
         
         self.title_bar.addWidget(minimize_button)
         self.title_bar.addWidget(close_button)
+
+
+    def wordzyLayout(self):
+        self.github = QPushButton()
+        self.github.setCursor(Qt.CursorShape.PointingHandCursor)
+
+        self.pixmap_git = QPixmap(resourcePath("github_logo.png"))
+        
+        self.github.setIcon(QIcon(self.pixmap_git))
+        self.github.setFocusPolicy(Qt.NoFocus)
+        
+        self.github.setIconSize(self.pixmap_git.size())
+
+        self.github.setStyleSheet("""
+            QPushButton {
+                border: none;
+                border-radius: 5px;
+                margin-left: 10px;
+            }
+            QPushButton:hover {
+                background-color: #5c5c5c;
+                border-radius: 5px;
+            }
+            QPushButton:pressed {
+                background-color: #6a6a6a;
+                border-radius: 5px;
+            }
+        """)
+        self.github.setToolTip("https://github.com/mk-ehe/WordZy")
+        self.github.clicked.connect(self.redirectGithub)
+        self.wordzy_layout.addWidget(self.github, 0, 0, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
+
+
+        self.wordzy_label = QLabel("WordZy")
+        self.wordzy_label.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop)
+        self.wordzy_label.setStyleSheet("""
+            font-size: 46px;
+            font-weight: bold;
+            color: white;
+        """)
+        self.wordzy_layout.addWidget(self.wordzy_label, 0, 0, Qt.AlignmentFlag.AlignCenter)
+
+
+        self.user_info_widget = QWidget()
+        self.user_info_layout = QHBoxLayout(self.user_info_widget)
+        self.user_info_layout.setContentsMargins(0, 0, 14, 0)
+        self.user_info_layout.setAlignment(Qt.AlignmentFlag.AlignRight)
+
+        self.username_label = QLabel()
+        self.username_label.setStyleSheet("color: white; font: bold 20px Arial; padding-top: 5px;")
+        self.user_info_layout.addWidget(self.username_label)
+
+        self.username_logo = QLabel()
+        self.pixmap = QPixmap(resourcePath("logo.png"))
+        self.username_logo.setPixmap(self.pixmap)
+        self.user_info_layout.addWidget(self.username_logo)
+
+
+        self.logout_button = QPushButton()
+        self.logout_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.logout_button.setFocusPolicy(Qt.NoFocus)
+        self.logout_button.setFixedSize(80, 30)
+        self.logout_button.setStyleSheet("""
+            QPushButton {
+                background-color: #d90000;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                font-weight: bold;
+                font-size: 14px;
+                margin-top: 4px;
+                margin-left: 7px;
+                padding-bottom: 2px;
+                padding-right: 1px;
+            }
+            QPushButton:hover { background-color: red; }
+            QPushButton:pressed { background-color: #b30000; }
+        """)
+        self.logout_button.clicked.connect(self.logout)
+        self.user_info_layout.addWidget(self.logout_button)
+
+        self.wordzy_layout.addWidget(self.user_info_widget, 0, 0, Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop)
+
+    
+    def redirectGithub(self):
+
+        url = QUrl("https://github.com/mk-ehe/WordZy")
+        QDesktopServices.openUrl(url)
 
 
     def createGrid(self):
