@@ -26,7 +26,11 @@ def resourcePath(relative_path):
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setGeometry(390, 140, 1200, 750)
+        width = 1200
+        height = 750
+        self.resize(width, height)
+        screen = QApplication.primaryScreen().availableGeometry()
+        self.move((screen.width() - width) // 2, (screen.height() - height) // 2)
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowMinimizeButtonHint)
         self.setStyleSheet("""
             QWidget {

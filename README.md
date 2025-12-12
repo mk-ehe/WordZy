@@ -94,5 +94,7 @@ WordZy/
 ├── requirements.txt  
 ├── logo.png          
 ├── start_screen.png  
-├── game_screen.png   
+├── game_screen.png
+├── github_logo.png
+├── .gitignore   
 └── README.md         
