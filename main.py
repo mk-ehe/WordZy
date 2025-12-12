@@ -154,7 +154,6 @@ class MainWindow(QMainWindow):
         self.left_layout.setSpacing(5)
         self.left_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         
-        self.last_words = self.getLastWords()
         self.last_seven_text = QLabel("Last 7 words")
         self.last_seven_text.setStyleSheet("""
             color: white;
@@ -163,7 +162,6 @@ class MainWindow(QMainWindow):
         """)
         self.last_seven_text.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.left_layout.addWidget(self.last_seven_text)
-        self.addLastWords()
 
 
         self.right_container = QWidget()
@@ -373,6 +371,10 @@ class MainWindow(QMainWindow):
 
 
     def showGame(self, username):
+        self.last_words = self.getLastWords()
+        self.clearLastWords()
+        self.addLastWords()
+        
         self.username = username
 
         if self.username == "":
@@ -617,15 +619,23 @@ class MainWindow(QMainWindow):
 
     def addLastWords(self):
         for i, word in enumerate(self.last_words):
-            self.left_widget = QLabel(word.upper())
+            left_widget = QLabel(word.upper())
             if i != 0:
-                self.left_widget.setStyleSheet("color: white; font: bold 22px Arial; background-color: #808080;")
+                left_widget.setStyleSheet("color: white; font: bold 22px Arial; background-color: #808080;")
             else:
-                self.left_widget.setStyleSheet("color: white; font: bold 22px Arial; background-color: #00aaed;")
-            self.left_widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            self.left_widget.setContentsMargins(0, 2, 0, 0)
-            self.left_widget.setFixedWidth(150)
-            self.left_layout.addWidget(self.left_widget)
+                left_widget.setStyleSheet("color: white; font: bold 22px Arial; background-color: #00aaed;")
+            left_widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            left_widget.setContentsMargins(0, 2, 0, 0)
+            left_widget.setFixedWidth(150)
+            self.left_layout.addWidget(left_widget)
+
+
+    def clearLastWords(self):
+        while self.left_layout.count() > 1:
+            item = self.left_layout.takeAt(1)
+            widget = item.widget()
+            if widget:
+                widget.deleteLater()
 
 
     def createRightLayout(self):
