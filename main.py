@@ -27,8 +27,19 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setGeometry(390, 140, 1200, 750)
-        self.setStyleSheet("""background-color: #383838;""")
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowMinimizeButtonHint)
+        self.setStyleSheet("""
+            QWidget {
+                background-color: #383838;
+            }
+            QToolTip {
+                background-color: #212121;
+                color: white;
+                border: 1px solid white;
+                border-radius: 5px;
+            }
+        """)
+
 
         self._drag_position = QPoint()
         self._dragging = False
