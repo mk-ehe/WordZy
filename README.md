@@ -86,14 +86,12 @@ Ensure you have Python installed. You will need the following packages:
 
 ```text
 WordZy/
-├── main.py           
+├── .gitignore
 ├── database.py
-├── LICENSE            
-├── Entry.py          
-├── requirements.txt  
-├── logo.png          
-├── start_screen.png  
-├── game_screen.png
+├── Entry.py   
 ├── github_logo.png
-├── .gitignore   
-└── README.md         
+├── LICENSE
+├── logo.png   
+├── main.py        
+├── README.md  
+└── requirements.txt       
