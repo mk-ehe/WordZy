@@ -16,7 +16,7 @@ Unlike the web version, WordZy features a robust **user authentication system**,
 
 | Start Screen | Gameplay |
 |:---:|:---:|
-| <img width="1200" height="750" alt="start_screen" src="https://github.com/user-attachments/assets/e62094a2-322b-404c-879a-dee8d21afdc7" />| <img width="1134" height="728" alt="game_screen" src="https://github.com/user-attachments/assets/258fcfd7-6502-4b20-b467-4fbd1d264f8f" /> |
+| <img width="1200" height="750" alt="start_screen" src="https://github.com/user-attachments/assets/e62094a2-322b-404c-879a-dee8d21afdc7" />| <img width="1160" height="750" alt="game_screen" src="https://github.com/user-attachments/assets/258fcfd7-6502-4b20-b467-4fbd1d264f8f" /> |
 
 ---
 
