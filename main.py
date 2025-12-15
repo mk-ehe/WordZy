@@ -835,6 +835,7 @@ class MainWindow(QMainWindow):
                 self.current_col -= 1
                 self.updateGridCell("")
                 self.setActiveCell()
+                self.info_label.setText("")
         
         elif text == "Enter":
             if self.current_col == 5 and self.current_row < 6:
@@ -1019,6 +1020,7 @@ class MainWindow(QMainWindow):
                 self.current_col -= 1
                 self.updateGridCell("")
                 self.setActiveCell()
+                self.info_label.setText("")
 
         elif key == Qt.Key.Key_Return or key == Qt.Key.Key_Enter:
             if self.current_col == 5 and self.current_row < 6:
