@@ -148,7 +148,7 @@ def setStreakToZero(username):
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
 
-    sql_query = f"UPDATE users SET streak = 0 WHERE username = ?"
+    sql_query = "UPDATE users SET streak = 0 WHERE username = ?"
 
     try:
         cursor.execute(sql_query, (username,))
