@@ -11,7 +11,6 @@ import os
 
 import database
 from Entry import EntryScreen
-import ctypes
 
 
 def resourcePath(relative_path):
