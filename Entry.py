@@ -1,5 +1,6 @@
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QHBoxLayout
 from PySide6.QtCore import Qt, Signal
+
 import database
 
 class EntryScreen(QWidget):
