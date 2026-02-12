@@ -10,7 +10,7 @@ import sys
 import os
 
 import database
-from entry import EntryScreen
+from Entry import EntryScreen
 
 
 def resourcePath(relative_path):
