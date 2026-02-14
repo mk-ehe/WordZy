@@ -10,7 +10,7 @@ import sys
 import os
 
 import database
-from Entry import EntryScreen
+from entry import EntryScreen
 
 
 def resourcePath(relative_path):
@@ -569,7 +569,6 @@ class MainWindow(QMainWindow):
 
     
     def redirectGithub(self):
-
         url = QUrl("https://github.com/mk-ehe/WordZy")
         QDesktopServices.openUrl(url)
 
@@ -687,8 +686,8 @@ class MainWindow(QMainWindow):
 
 
         percentage = round(database.getUserWins(self.username) / database.getTotalGamesPlayed(self.username) * 100, 2) \
-            if database.getTotalGamesPlayed(self.username) != 0 else "0.00"
-        self.percentage = QLabel(f"Win: {percentage}")
+            if database.getTotalGamesPlayed(self.username) != 0 else "0.0"
+        self.percentage = QLabel(f"Win: {percentage}%")
         self.percentage.setStyleSheet("""color: white;
                                 background-color: qlineargradient(
                                 x1:0, y1:0, x2:0, y2:1,
@@ -866,6 +865,23 @@ class MainWindow(QMainWindow):
         start_idx = self.current_row * self.GRID_COLS
         end_idx = start_idx + self.GRID_COLS
 
+
+        if self.int_word == 1 and self.username != "":
+            self.runInBackground(database.totalGamesUpdate, self.username)
+            
+            try:
+                curr_played = int(self.total_games.text().split(": ")[1])
+                new_played = curr_played + 1
+                self.total_games.setText(f"Played: {new_played}")
+                
+                curr_wins = int(self.wins.text().split(": ")[1])
+                if new_played > 0:
+                    pct = round((curr_wins / new_played) * 100, 2)
+                    self.percentage.setText(f"Win: {pct}%")
+            except:
+                pass
+
+
         available_letters = list(self.correct_word)
         current_row_letters = []
         
@@ -944,7 +960,7 @@ class MainWindow(QMainWindow):
         except:
             return
 
-        new_played = curr_played + 1
+        new_played = curr_played
         new_wins = curr_wins + 1 if win else curr_wins
         new_streak = curr_streak + 1 if win else 0
 

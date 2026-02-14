@@ -23,12 +23,42 @@ def InitDB():
             total_games_played INTEGER DEFAULT 0,
             streak INTEGER DEFAULT 0,
             time_finished TEXT DEFAULT NULL,
-            last_played_date TEXT DEFAULT NULL
+            last_played_date TEXT DEFAULT NULL,
+            won_last_time BOOLEAN DEFAULT FALSE
         )
     ''')
 
+    cursor.execute("PRAGMA table_info(users)")
+    columns_info = cursor.fetchall()
+    column_names = [info[1] for info in columns_info]
+
+    if 'won_last_time' not in column_names:
+        cursor.execute("ALTER TABLE users ADD COLUMN won_last_time BOOLEAN DEFAULT 0")
+        connection.commit()
+
     connection.commit()
     connection.close()
+
+
+def totalGamesUpdate(username):
+    try:
+        connection = sqlite3.connect(DB_NAME)
+        cursor = connection.cursor()
+
+        cursor.execute("SELECT total_games_played FROM users WHERE username=?", (username,))
+        result = cursor.fetchone()
+        
+        if result:
+            cursor.execute("UPDATE users SET total_games_played=total_games_played + 1 WHERE username=?", (username,))
+            connection.commit()
+            return True
+            
+    except Exception as e:
+        print(e)
+        return False
+    finally:
+        connection.close()
+
 
 def register(username, password):
     connection = sqlite3.connect(DB_NAME)
@@ -81,13 +111,12 @@ def finalizeGame(username, won, time_str):
     cursor = conn.cursor()
     
     try:
-        cursor.execute("SELECT wins, streak, total_games_played FROM users WHERE username = ?", (username,))
+        cursor.execute("SELECT wins, streak FROM users WHERE username = ?", (username,))
         row = cursor.fetchone()
         
         if row:
-            curr_wins, curr_streak, curr_total = row
+            curr_wins, curr_streak = row
             
-            new_total = curr_total + 1
             new_wins = curr_wins + 1 if won else curr_wins
             
             if won:
@@ -97,9 +126,9 @@ def finalizeGame(username, won, time_str):
 
             cursor.execute("""
                 UPDATE users 
-                SET wins=?, streak=?, total_games_played=?, time_finished=? 
+                SET wins=?, streak=?, time_finished=?, won_last_time=?
                 WHERE username=?
-            """, (new_wins, new_streak, new_total, time_str, username))
+            """, (new_wins, new_streak, time_str, won, username,))
 
             conn.commit()
             return True
@@ -142,21 +171,6 @@ def getTotalGamesPlayed(username):
             return 0
     except:
         return 0
-
-
-def setStreakToZero(username):
-    conn = sqlite3.connect(DB_NAME)
-    cursor = conn.cursor()
-
-    sql_query = "UPDATE users SET streak = 0 WHERE username = ?"
-
-    try:
-        cursor.execute(sql_query, (username,))
-        conn.commit()
-    except Exception as e:
-        print(e)
-    finally:
-        conn.close() 
 
 
 def getUserStreak(username):
@@ -233,10 +247,11 @@ def checkAndResetDaily(username):
     today_str = today_date_obj.strftime("%Y-%m-%d")
     
     try:
-        cursor.execute("SELECT last_played_date FROM users WHERE username = ?", (username,))
+        cursor.execute("SELECT last_played_date, won_last_time FROM users WHERE username = ?", (username,))
         result = cursor.fetchone()
         
         last_played_str = result[0] if result else None
+        won_last_time_result = result[1] if result else None
 
         if last_played_str:
             try:
@@ -244,7 +259,7 @@ def checkAndResetDaily(username):
                 
                 delta = today_date_obj - last_played_obj
                 
-                if delta.days > 1:
+                if delta.days > 1 or not won_last_time_result:
                     cursor.execute("UPDATE users SET streak = 0 WHERE username = ?", (username,))
                     conn.commit()
             except ValueError:
@@ -254,7 +269,7 @@ def checkAndResetDaily(username):
             cursor.execute("""
                 UPDATE users 
                 SET word1=NULL, word2=NULL, word3=NULL, word4=NULL, word5=NULL, word6=NULL, 
-                    time_finished="00:00", last_played_date=?
+                    time_finished="00:00", last_played_date=?, won_last_time=0
                 WHERE username=?
             """, (today_str, username))
             conn.commit()
