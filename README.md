@@ -88,7 +88,7 @@ Ensure you have Python installed. You will need the following packages:
 WordZy/
 ├── .gitignore
 ├── database.py
-├── Entry.py   
+├── entry.py   
 ├── github_logo.png
 ├── LICENSE
 ├── logo.png   
